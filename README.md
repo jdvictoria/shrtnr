@@ -34,27 +34,37 @@ A production-grade, fully serverless URL shortener built with Next.js 15, Prisma
 
 ## Features
 
-| Tier         | Feature                              | Status |
-|--------------|--------------------------------------|--------|
-| Basic        | Create short URLs                    | ✅     |
-| Basic        | Redirect to original link            | ✅     |
-| Basic        | QR code generation + PNG download    | ✅     |
-| Basic        | REST API                             | ✅     |
-| Intermediate | Click tracking (aggregate counter)   | ✅     |
-| Intermediate | Per-click event log                  | ✅     |
-| Intermediate | Analytics chart (7d / 30d)           | ✅     |
-| Intermediate | Country / device / browser / OS breakdown | ✅ |
-| Intermediate | Top referrers                        | ✅     |
-| Intermediate | Expiration dates                     | ✅     |
-| Intermediate | Custom aliases + live availability   | ✅     |
-| Intermediate | Bulk link creation via CSV           | ✅     |
-| Advanced     | User accounts (GitHub OAuth + email/password) | ✅ |
-| Advanced     | Per-user dashboard & link isolation  | ✅     |
-| Advanced     | Password-protected links             | ✅     |
-| Advanced     | Geographic redirects per country     | ✅     |
-| Advanced     | Rate limiting (sliding window)       | ✅     |
-| Advanced     | Redis read-through cache             | ✅     |
-| Advanced     | DB indexes for fast lookups          | ✅     |
+| Tier         | Feature                                        | Status |
+|--------------|------------------------------------------------|--------|
+| Basic        | Create short URLs                              | ✅     |
+| Basic        | Redirect to original link                      | ✅     |
+| Basic        | QR code generation + PNG download              | ✅     |
+| Basic        | REST API                                       | ✅     |
+| Intermediate | Click tracking (aggregate counter)             | ✅     |
+| Intermediate | Per-click event log                            | ✅     |
+| Intermediate | Analytics chart (7d / 30d)                     | ✅     |
+| Intermediate | Country / device / browser / OS breakdown      | ✅     |
+| Intermediate | Country heatmap (world map)                    | ✅     |
+| Intermediate | Top referrers                                  | ✅     |
+| Intermediate | Expiration dates                               | ✅     |
+| Intermediate | Custom aliases + live availability             | ✅     |
+| Intermediate | Bulk link creation via CSV                     | ✅     |
+| Advanced     | User accounts (GitHub OAuth + email/password)  | ✅     |
+| Advanced     | Per-user dashboard & link isolation            | ✅     |
+| Advanced     | Password-protected links                       | ✅     |
+| Advanced     | Geographic redirects per country               | ✅     |
+| Advanced     | Rate limiting (sliding window)                 | ✅     |
+| Advanced     | Redis read-through cache                       | ✅     |
+| Advanced     | DB indexes for fast lookups                    | ✅     |
+| SaaS         | Link folders (organize by project/category)    | ✅     |
+| SaaS         | Link tags (multi-label, color-coded)           | ✅     |
+| SaaS         | Link notes (internal annotation)              | ✅     |
+| SaaS         | Archive / restore links                        | ✅     |
+| SaaS         | Deactivate / reactivate links                  | ✅     |
+| SaaS         | Pin links to top of dashboard                  | ✅     |
+| SaaS         | Edit link (URL, slug, expiry, folder, tags)    | ✅     |
+| SaaS         | Teams with role-based permissions              | ✅     |
+| SaaS         | Team invitations via email token               | ✅     |
 
 ---
 
@@ -68,10 +78,12 @@ A production-grade, fully serverless URL shortener built with Next.js 15, Prisma
 | Cache          | Upstash Redis                     | Serverless-compatible, edge-ready, free tier              |
 | UI             | shadcn/ui + Tailwind CSS          | Accessible components, no runtime CSS-in-JS               |
 | Charts         | Recharts                          | Composable, well-maintained React chart library           |
+| Maps           | react-simple-maps                 | Lightweight SVG world map for country heatmap             |
 | QR Codes       | qrcode.react                      | Client-side SVG generation + Canvas PNG export            |
 | Password hash  | bcryptjs                          | Secure password storage (cost factor 12)                  |
 | UA parsing     | Custom (`lib/ua-parser.ts`)       | Zero dependency, regex-based device/browser/OS detection  |
 | CSV parsing    | papaparse                         | Robust client-side CSV → bulk link import                 |
+| Font           | JetBrains Mono                    | Monospace font for a developer-friendly aesthetic         |
 | Deployment     | Vercel                            | Automatic deployments, edge network, free SSL             |
 
 ---
@@ -137,6 +149,7 @@ flowchart TD
         HOME["/ — Home Page\nShortenForm (Server Component)"]
         DASH["dashboard/\nDashboard (Server Component)"]
         DASHID["dashboard/:id\nAnalytics Page (Server Component)"]
+        TEAMS["dashboard/teams/*\nTeams (Server Components)"]
         SLUG[":slug — Route Handler\nGET /[slug]"]
         API_SHORTEN["POST /api/shorten"]
         API_BULK["POST /api/bulk-shorten"]
@@ -145,12 +158,13 @@ flowchart TD
         API_STATS["GET /api/links/:id/stats"]
         API_CHECK["GET /api/check-slug"]
         API_AUTH["GET/POST /api/auth/*\n(NextAuth handlers)"]
+        API_INVITE["GET /api/team/invite/accept"]
         PW_PAGE["pw/:slug\nPassword Gate Page"]
     end
 
     subgraph DataLayer["Data Layer"]
         REDIS["Upstash Redis\n• link:{slug} → CachedLink JSON\n• rl:{ip} sorted set (rate limit)\n• TTL: 30 days"]
-        POSTGRES["Prisma Postgres\n• User / Account / Session\n• Link / GeoRule\n• ClickEvent"]
+        POSTGRES["Prisma Postgres\n• User / Account / Session\n• Link / GeoRule / ClickEvent\n• Folder / Tag / TagsOnLinks\n• Team / TeamMember / TeamInvitation"]
     end
 
     Browser --> MW
@@ -166,8 +180,10 @@ flowchart TD
     Browser --> API_STATS
     Browser --> API_CHECK
     Browser --> API_AUTH
+    Browser --> API_INVITE
     Browser --> PW_PAGE
     Browser --> DASHID
+    Browser --> TEAMS
 
     SLUG -->|"1. GET link:{slug}"| REDIS
     REDIS -->|"MISS"| POSTGRES
@@ -177,6 +193,7 @@ flowchart TD
     HOME --> POSTGRES
     DASH --> POSTGRES
     DASHID --> POSTGRES
+    TEAMS --> POSTGRES
     API_SHORTEN --> REDIS
     API_SHORTEN --> POSTGRES
     API_BULK --> REDIS
@@ -187,6 +204,7 @@ flowchart TD
     API_STATS --> POSTGRES
     API_CHECK --> POSTGRES
     API_AUTH --> POSTGRES
+    API_INVITE --> POSTGRES
 ```
 
 ### Data flow summary
@@ -358,6 +376,7 @@ Check if a custom alias is available (used by live availability check in the UI)
 |--------|------|-------------|
 | `GET`  | `/:slug` | Redirect to original URL (302) |
 | `GET`  | `/pw/:slug` | Password gate page for protected links |
+| `GET`  | `/api/team/invite/accept?token=...` | Accept a team invitation |
 
 ---
 
@@ -375,6 +394,9 @@ This section covers the design decisions behind shrtnr and maps them to real-wor
 - Track click analytics: count, time-series, country, device, browser, OS, referrer
 - Optional features per link: custom alias, expiration, password protection, geo-redirect rules
 - User accounts: each user sees only their own links
+- Organize links into folders, apply tags, add internal notes
+- Archive, deactivate, and pin links
+- Collaborate via teams with role-based access (admin / editor / viewer)
 
 **Non-functional requirements:**
 - **High availability:** redirects succeed even if the database is slow/down (Redis serves the hot path)
@@ -405,19 +427,20 @@ GET /:slug
      ▼
 1. Redis GET "link:{slug}"                   ← ~0.5ms round-trip (Upstash)
    ├── HIT  (CachedLink JSON)
-   │     ├── expiresAt < now?  → 410 Gone
+   │     ├── isActive = false?  → 302 /not-found
+   │     ├── expiresAt < now?  → 302 /link-expired
    │     ├── hasPassword && no cookie?  → 302 /pw/:slug
    │     └── geoRules match x-vercel-ip-country?  → 302 geo URL
    │
    └── MISS
          ▼
    2. Prisma SELECT WHERE slug=? INCLUDE geoRules  ← ~5–20ms
-         ├── NOT FOUND  → 404
+         ├── NOT FOUND  → 302 /not-found
          └── FOUND
                ▼
          3. Redis SET "link:{slug}" <JSON> EX 2592000   ← cache for 30d
                ▼
-         (same expiry / password / geo checks as HIT path)
+         (same active / expiry / password / geo checks as HIT path)
      │
      ▼
 4. fire-and-forget (non-blocking):
@@ -442,11 +465,12 @@ type CachedLink = {
   url: string;
   expiresAt: string | null;
   hasPassword: boolean;
+  isActive: boolean;
   geoRules: Array<{ country: string; url: string }>;
 };
 ```
 
-This means *all redirect decisions* are made from Redis alone on a cache hit — expiry, password gate, and geo routing never touch the database.
+This means *all redirect decisions* are made from Redis alone on a cache hit — active check, expiry, password gate, and geo routing never touch the database.
 
 ---
 
@@ -512,23 +536,24 @@ Request → Redis MISS → DB query → cache result → serve
 ```
 
 **Key:** `link:{slug}`
-**Value:** Full `CachedLink` JSON (id, url, expiresAt, hasPassword, geoRules)
+**Value:** Full `CachedLink` JSON (id, url, expiresAt, hasPassword, isActive, geoRules)
 **TTL:** 30 days — cold links evict naturally; hot links stay warm
 
 #### Why store the full object, not just the URL?
 
 Originally the cache stored only the URL string. This caused two problems:
-1. Every redirect had to query Postgres to check `expiresAt`
+1. Every redirect had to query Postgres to check `expiresAt` and `isActive`
 2. Geo rules and password status required DB round-trips on every redirect
 
-Storing the full `CachedLink` JSON means the hot path — which may include geo routing and password checks — never queries the database.
+Storing the full `CachedLink` JSON means the hot path — which may include geo routing, active check, and password checks — never queries the database.
 
 #### Cache invalidation
 
-Three explicit invalidation events:
+Four explicit invalidation events:
 1. **Link deleted** → `redis.del("link:{slug}")`
 2. **Link URL updated** → `redis.set(key, newValue)` (overwrite)
-3. **Link expired** → evict in the redirect handler when expiry is detected; on next access the DB query will return the link but the expired status will be set
+3. **Link deactivated** → `redis.del("link:{slug}")` (force re-fetch with updated `isActive`)
+4. **Link expired** → evict in the redirect handler when expiry is detected
 
 #### Eviction policy
 
@@ -611,6 +636,20 @@ callbacks: {
 
 ---
 
+### Teams & Role-Based Access
+
+Links can belong to a team in addition to a user. Team membership is role-gated:
+
+| Role    | Create links | Edit links | Delete links | Manage members |
+|---------|-------------|------------|--------------|----------------|
+| Admin   | ✅          | ✅         | ✅           | ✅             |
+| Editor  | ✅          | ✅         | ❌           | ❌             |
+| Viewer  | ❌          | ❌         | ❌           | ❌             |
+
+Team invitations are token-based: the admin generates a signed token, emails it, and the recipient accepts via `GET /api/team/invite/accept?token=...`. The token is single-use and scoped to the invited email address.
+
+---
+
 ### Geographic Routing
 
 Each link can have an ordered list of `GeoRule` records: if the visitor's country matches a rule, they are redirected to that rule's URL instead of the default.
@@ -684,41 +723,41 @@ GET /:slug
 -- Auth tables (managed by PrismaAdapter)
 User, Account, Session, VerificationToken
 
--- Application tables
+-- Link management
 CREATE TABLE "Link" (
   id           TEXT PRIMARY KEY,
-  slug         TEXT UNIQUE NOT NULL,     -- indexed via UNIQUE
+  slug         TEXT UNIQUE NOT NULL,
   url          TEXT NOT NULL,
   clicks       INTEGER DEFAULT 0,
   expires_at   TIMESTAMPTZ,
-  password_hash TEXT,                    -- bcrypt hash, nullable
+  password_hash TEXT,
+  is_active    BOOLEAN DEFAULT true,
+  is_archived  BOOLEAN DEFAULT false,
+  is_pinned    BOOLEAN DEFAULT false,
+  notes        TEXT,
   user_id      TEXT REFERENCES "User"(id) ON DELETE SET NULL,
+  folder_id    TEXT REFERENCES "Folder"(id) ON DELETE SET NULL,
+  team_id      TEXT REFERENCES "Team"(id) ON DELETE SET NULL,
   created_at   TIMESTAMPTZ DEFAULT now(),
   updated_at   TIMESTAMPTZ DEFAULT now()
 );
-CREATE INDEX idx_link_slug     ON "Link"(slug);        -- redirect lookup
-CREATE INDEX idx_link_user_id  ON "Link"(user_id);     -- dashboard list
-CREATE INDEX idx_link_created  ON "Link"(created_at);  -- sort
+CREATE INDEX idx_link_slug     ON "Link"(slug);
+CREATE INDEX idx_link_user_id  ON "Link"(user_id);
+CREATE INDEX idx_link_created  ON "Link"(created_at);
 
-CREATE TABLE "GeoRule" (
-  id       TEXT PRIMARY KEY,
-  link_id  TEXT NOT NULL REFERENCES "Link"(id) ON DELETE CASCADE,
-  country  TEXT NOT NULL,
-  url      TEXT NOT NULL,
-  UNIQUE (link_id, country)
-);
-CREATE INDEX idx_georule_link ON "GeoRule"(link_id);
+-- Organization
+CREATE TABLE "Folder" (id, name, color, user_id, created_at);
+CREATE TABLE "Tag" (id, name, color, user_id, created_at);
+CREATE TABLE "TagsOnLinks" (link_id, tag_id, PRIMARY KEY (link_id, tag_id));
 
-CREATE TABLE "ClickEvent" (
-  id         TEXT PRIMARY KEY,
-  link_id    TEXT NOT NULL REFERENCES "Link"(id) ON DELETE CASCADE,
-  referer    TEXT,
-  country    TEXT,
-  device     TEXT,    -- "mobile" | "tablet" | "desktop"
-  browser    TEXT,    -- "Chrome" | "Firefox" | "Safari" | ...
-  os         TEXT,    -- "iOS" | "Android" | "Windows" | ...
-  created_at TIMESTAMPTZ DEFAULT now()
-);
+-- Teams
+CREATE TABLE "Team" (id, name, created_at);
+CREATE TABLE "TeamMember" (id, team_id, user_id, role ENUM('admin','editor','viewer'), joined_at);
+CREATE TABLE "TeamInvitation" (id, team_id, email, role, token UNIQUE, accepted_at, expires_at, created_at);
+
+-- Analytics
+CREATE TABLE "GeoRule" (id, link_id, country, url, UNIQUE (link_id, country));
+CREATE TABLE "ClickEvent" (id, link_id, referer, country, device, browser, os, created_at);
 CREATE INDEX idx_click_link             ON "ClickEvent"(link_id);
 CREATE INDEX idx_click_link_created_at  ON "ClickEvent"(link_id, created_at);
 ```
@@ -913,7 +952,7 @@ A: Multi-layer:
 A: Next.js App Router static routes take priority over `[slug]` dynamic routes — `/dashboard` is always handled by `app/dashboard/page.tsx`. Additionally, a `RESERVED_SLUGS` blocklist in the shortening action prevents creating aliases that shadow system routes:
 
 ```typescript
-const RESERVED = new Set(["dashboard", "api", "pw", "sign-in", "sign-up"]);
+const RESERVED = new Set(["dashboard", "api", "pw", "sign-in", "sign-up", "not-found", "link-expired"]);
 if (RESERVED.has(slug)) return { success: false, error: "Reserved alias" };
 ```
 
@@ -928,6 +967,27 @@ A: Vercel injects `x-vercel-ip-country` (ISO 3166-1 alpha-2) into every request 
 **Q: How are password-protected links secured?**
 
 A: The password is hashed with bcrypt (cost factor 12) and stored in Postgres — never in Redis, never in cookies. Verification sets an `httpOnly; SameSite=Strict` cookie scoped to the specific slug. The cookie value is `1` (a presence flag), not the password or hash — there's nothing to reverse.
+
+---
+
+**Q: How does the dashboard avoid stale data when switching filters (All Links / Archived / Folders)?**
+
+A: `LinksTable` is a client component that stores links in React state with `useState(initialLinks)`. React only uses the initial value once — navigating between `/dashboard` and `/dashboard?archived=1` sends new props but doesn't reset state. The fix: a `key` prop on `LinksTable` derived from the active filter combination forces React to unmount and remount the component, reinitializing state with the correct server-fetched data.
+
+---
+
+**Q: How do you implement role-based access for teams?**
+
+A: Each `TeamMember` record has a `role` enum (admin/editor/viewer). Server Actions check the caller's role before mutating data. The check pattern:
+
+```typescript
+const member = await prisma.teamMember.findFirst({
+  where: { teamId, userId: session.user.id }
+});
+if (!member || member.role === "viewer") return { success: false, error: "Insufficient permissions" };
+```
+
+Roles are enforced server-side — the UI hides controls for insufficient roles, but the server always re-validates.
 
 ---
 
@@ -968,7 +1028,7 @@ What makes this project impressive to hiring managers and interviewers:
 
 | Decision | What it demonstrates |
 |----------|---------------------|
-| Redis CachedLink JSON (not just URL string) | You understand cache design and minimizing hot-path I/O |
+| Redis CachedLink JSON with `isActive` flag | You think about all redirect decisions being made from cache, not just URL lookup |
 | Fire-and-forget click tracking | You understand latency tradeoffs and async patterns |
 | Sliding window rate limiting | You know the difference between fixed and sliding windows and why it matters |
 | `(link_id, created_at)` composite index | You understand query patterns and how indexes serve them |
@@ -977,6 +1037,9 @@ What makes this project impressive to hiring managers and interviewers:
 | `hasPassword` flag in Redis (not just `passwordHash`) | You avoid unnecessary DB round-trips by encoding auth state in cache |
 | Geo rules in Redis CachedLink | You think about data locality and avoid N+1 cache misses |
 | bcrypt cost factor 12 | You understand the tradeoff between security and server load |
+| `key` prop on LinksTable for filter changes | You understand React's reconciliation model and state initialization pitfalls |
+| Teams with server-side role enforcement | You know that client-side permission hiding is not security |
+| Folder/tag organization with optimistic UI | You understand UX patterns for fast perceived performance |
 
 ### Scalability discussion points (for interviews)
 
@@ -984,10 +1047,12 @@ What makes this project impressive to hiring managers and interviewers:
 2. **Analytics can scale independently** — the current Postgres `ClickEvent` table is trivially replaceable with ClickHouse or BigQuery without touching the redirect path
 3. **Auth is isolated** — the user system is a separate concern from the redirect system; one can scale independently of the other
 4. **Connection pooling** — Prisma Postgres includes a built-in connection pooler, solving the serverless cold-start connection exhaustion problem
+5. **Teams as multi-tenancy** — the `teamId` FK on `Link` is the foundation for workspace-level isolation, a pattern used by every B2B SaaS product
 
 ### Honest limitations (shows engineering maturity)
 
 - `Link.clicks` counter has a race condition under high concurrent load (use Redis `INCR` + batch-write for correctness at scale)
 - Per-click DB write is still on the critical path today — a production system would queue this
+- Team invitation emails are token links, not SMTP-sent — a production system integrates Resend or SendGrid
 - No A/B testing, webhook support, or UTM builder (natural next features)
 - Single-region — multi-region requires distributed ID generation (Snowflake) and replication strategy
