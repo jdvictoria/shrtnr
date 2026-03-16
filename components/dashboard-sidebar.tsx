@@ -151,7 +151,7 @@ export function DashboardSidebar({
                   S
                 </div>
                 <div className="flex flex-col leading-tight">
-                  <span className="font-semibold text-sm">shrtnr</span>
+                  <span className="font-semibold text-sm">shrten</span>
                   <span className="text-xs text-sidebar-foreground/50">URL Shortener</span>
                 </div>
               </Link>

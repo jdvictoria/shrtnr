@@ -21,7 +21,7 @@ export async function Navbar() {
       <div className="container mx-auto px-4 h-14 flex items-center justify-between max-w-6xl">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg">
           <Link2 className="h-5 w-5" />
-          shrtnr
+          shrten
         </Link>
 
         <div className="flex items-center gap-2">

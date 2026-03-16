@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "Sign Up",
+  description: "Create a free shrten account to shorten URLs, track analytics, and manage your links.",
+  robots: { index: false, follow: false },
+};
 import Link from "next/link";
 import { Github } from "lucide-react";
 import { signIn } from "@/auth";

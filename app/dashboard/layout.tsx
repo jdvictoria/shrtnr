@@ -36,7 +36,7 @@ export default async function DashboardLayout({
         {/* Mobile top bar */}
         <header className="flex h-12 items-center gap-2 border-b border-border px-4 md:hidden shrink-0">
           <SidebarTrigger />
-          <span className="font-semibold text-sm">shrtnr</span>
+          <span className="font-semibold text-sm">shrten</span>
         </header>
         {children}
       </SidebarInset>
