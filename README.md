@@ -1,4 +1,4 @@
-# shrtnr — URL Shortener
+# shrten — URL Shortener
 
 A production-grade, fully serverless URL shortener built with Next.js 15, Prisma Postgres, Upstash Redis, Auth.js (NextAuth v5), and shadcn/ui. Designed to be both a deployable product and a deep study resource for **system design interviews** — the URL shortener is the single most common system design question at top tech companies.
 
@@ -92,8 +92,8 @@ A production-grade, fully serverless URL shortener built with Next.js 15, Prisma
 
 ```bash
 # 1. Clone and install
-git clone https://github.com/your-username/shrtnr.git
-cd shrtnr
+git clone https://github.com/your-username/shrten.git
+cd shrten
 npm install
 
 # 2. Configure environment
@@ -252,7 +252,7 @@ All fields except `url` are optional.
 {
   "id": "clxyz123",
   "slug": "my-link",
-  "shortUrl": "https://shrtnr.app/my-link",
+  "shortUrl": "https://shrten.app/my-link",
   "url": "https://example.com/very/long/url",
   "expiresAt": "2025-12-31T23:59:59.000Z",
   "createdAt": "2025-01-15T10:00:00.000Z"
@@ -291,7 +291,7 @@ List the authenticated user's links, paginated.
     {
       "id": "...",
       "slug": "abc1234",
-      "shortUrl": "https://shrtnr.app/abc1234",
+      "shortUrl": "https://shrten.app/abc1234",
       "url": "https://example.com",
       "clicks": 42,
       "expiresAt": null,
@@ -382,7 +382,7 @@ Check if a custom alias is available (used by live availability check in the UI)
 
 ## System Design Deep Dive
 
-This section covers the design decisions behind shrtnr and maps them to real-world scale. System design interviewers use URL shorteners precisely because they touch every hard problem: read-heavy workloads, distributed ID generation, caching, analytics, and user isolation.
+This section covers the design decisions behind shrten and maps them to real-world scale. System design interviewers use URL shorteners precisely because they touch every hard problem: read-heavy workloads, distributed ID generation, caching, analytics, and user isolation.
 
 ---
 
@@ -908,7 +908,7 @@ Vercel handles this automatically for serverless deployments. Understanding the 
 | Weighted | Gradual traffic shifts (canary deploys) |
 
 **Stateless by design:**
-shrtnr has no in-process session state — all state lives in Redis or Postgres. Any server handles any request, making horizontal scaling trivial. This is intentional: stateful architectures (in-memory sessions, local caches) are one of the most common reasons applications fail to scale horizontally.
+shrten has no in-process session state — all state lives in Redis or Postgres. Any server handles any request, making horizontal scaling trivial. This is intentional: stateful architectures (in-memory sessions, local caches) are one of the most common reasons applications fail to scale horizontally.
 
 ---
 

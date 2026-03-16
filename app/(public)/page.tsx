@@ -1,5 +1,13 @@
+import type { Metadata } from "next";
 import { ShortenForm } from "@/components/shorten-form";
 import { Badge } from "@/components/ui/badge";
+
+export const metadata: Metadata = {
+  title: "shrten — Free URL Shortener",
+  description:
+    "Shorten any URL in seconds for free. No account required. Track clicks and manage links with shrten.",
+  alternates: { canonical: "/" },
+};
 
 export default function Home() {
   return (
