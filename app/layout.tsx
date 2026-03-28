@@ -44,6 +44,9 @@ export const metadata: Metadata = {
       "Create short links in seconds, track click analytics, and manage all your links from one dashboard.",
     creator: "@shrten",
   },
+  icons: {
+    icon: "/favicon.ico",
+  },
   robots: {
     index: true,
     follow: true,
