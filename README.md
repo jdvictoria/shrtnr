@@ -10,7 +10,7 @@ A production-grade, fully serverless URL shortener built with Next.js 15, Prisma
 2. [Tech Stack](#tech-stack)
 3. [Quick Start](#quick-start)
 4. [Environment Variables](#environment-variables)
-5. [GitHub OAuth Setup](#github-oauth-setup)
+5. [Legacy GitHub OAuth Compatibility](#legacy-github-oauth-compatibility-deprecated)
 6. [Architecture Diagram](#architecture-diagram)
 7. [API Reference](#api-reference)
 8. [System Design Deep Dive](#system-design-deep-dive)
@@ -49,7 +49,7 @@ A production-grade, fully serverless URL shortener built with Next.js 15, Prisma
 | Intermediate | Expiration dates                               | ✅     |
 | Intermediate | Custom aliases + live availability             | ✅     |
 | Intermediate | Bulk link creation via CSV                     | ✅     |
-| Advanced     | User accounts (GitHub OAuth + email/password)  | ✅     |
+| Advanced     | User accounts (email/password; legacy GitHub OAuth) | ✅ |
 | Advanced     | Per-user dashboard & link isolation            | ✅     |
 | Advanced     | Password-protected links                       | ✅     |
 | Advanced     | Geographic redirects per country               | ✅     |
@@ -73,7 +73,7 @@ A production-grade, fully serverless URL shortener built with Next.js 15, Prisma
 | Layer          | Technology                        | Why                                                       |
 |----------------|-----------------------------------|-----------------------------------------------------------|
 | Framework      | Next.js 15 App Router             | SSR, Server Actions, Route Handlers — one deployment      |
-| Auth           | Auth.js (NextAuth v5)             | GitHub OAuth + credentials, JWT sessions, PrismaAdapter   |
+| Auth           | Auth.js (NextAuth v5)             | Credentials, legacy GitHub OAuth, JWT sessions, PrismaAdapter |
 | Database       | Prisma + Prisma Postgres          | Managed Postgres with built-in connection pooling         |
 | Cache          | Upstash Redis                     | Serverless-compatible, edge-ready, free tier              |
 | UI             | shadcn/ui + Tailwind CSS          | Accessible components, no runtime CSS-in-JS               |
@@ -119,15 +119,17 @@ Open [http://localhost:3000](http://localhost:3000).
 | `UPSTASH_REDIS_REST_URL`    | Yes      | Upstash Redis REST endpoint                                   |
 | `UPSTASH_REDIS_REST_TOKEN`  | Yes      | Upstash Redis REST token                                      |
 | `AUTH_SECRET`               | Yes      | Random 32-char secret — `openssl rand -base64 32`             |
-| `AUTH_GITHUB_ID`            | No*      | GitHub OAuth App Client ID                                    |
-| `AUTH_GITHUB_SECRET`        | No*      | GitHub OAuth App Client Secret                                |
+| `AUTH_GITHUB_ID`            | No*      | Legacy GitHub OAuth App Client ID                             |
+| `AUTH_GITHUB_SECRET`        | No*      | Legacy GitHub OAuth App Client Secret                         |
 | `NEXT_PUBLIC_APP_URL`       | Yes      | Your deployment URL, no trailing slash                        |
 
-*GitHub OAuth is optional — email/password sign-up works without it.
+*GitHub OAuth is deprecated for new sign-ins. These variables are needed only while supporting existing GitHub-linked accounts.
 
 ---
 
-## GitHub OAuth Setup
+## Legacy GitHub OAuth Compatibility (Deprecated)
+
+GitHub is no longer offered on the sign-in or sign-up screens. The provider remains configured temporarily so existing GitHub-linked accounts are not abruptly invalidated.
 
 1. Go to [github.com/settings/developers](https://github.com/settings/developers) → **New OAuth App**
 2. Set **Homepage URL**: `http://localhost:3000` (or your production domain)
@@ -363,10 +365,10 @@ Check if a custom alias is available (used by live availability check in the UI)
 | Method | Path | Description |
 |--------|------|-------------|
 | `GET`  | `/api/auth/session` | Get current session |
-| `POST` | `/api/auth/signin/github` | Initiate GitHub OAuth |
+| `POST` | `/api/auth/signin/github` | Initiate legacy GitHub OAuth compatibility flow |
 | `POST` | `/api/auth/signin/credentials` | Sign in with email + password |
 | `POST` | `/api/auth/signout` | Sign out |
-| `GET`  | `/api/auth/callback/github` | GitHub OAuth callback |
+| `GET`  | `/api/auth/callback/github` | Legacy GitHub OAuth callback |
 
 ---
 
@@ -582,10 +584,10 @@ Or: use stale-while-revalidate — return the expired cached value immediately a
 
 Auth is implemented with **Auth.js (NextAuth v5)** using JWT sessions and the PrismaAdapter.
 
-#### Two providers
+#### Supported sign-in
 
-1. **GitHub OAuth** — one-click sign-in, no password management
-2. **Credentials** — email + bcrypt(password, 12) for users without GitHub
+1. **Credentials** — supported sign-up and sign-in using email + bcrypt(password, 12)
+2. **GitHub OAuth** — deprecated and hidden from the user-facing auth flow; retained temporarily for existing linked accounts
 
 #### User isolation
 
@@ -1004,8 +1006,8 @@ git push origin main
 #    UPSTASH_REDIS_REST_URL=https://...
 #    UPSTASH_REDIS_REST_TOKEN=...
 #    AUTH_SECRET=<run: openssl rand -base64 32>
-#    AUTH_GITHUB_ID=<from GitHub OAuth App>
-#    AUTH_GITHUB_SECRET=<from GitHub OAuth App>
+#    AUTH_GITHUB_ID=<optional, legacy compatibility only>
+#    AUTH_GITHUB_SECRET=<optional, legacy compatibility only>
 #    NEXT_PUBLIC_APP_URL=https://your-domain.vercel.app
 
 # 4. Run schema migration before first deploy
@@ -1015,7 +1017,7 @@ DATABASE_URL="postgres://..." npx prisma db push
 **Custom domain:**
 1. Vercel → Project → Settings → Domains → add domain
 2. Update `NEXT_PUBLIC_APP_URL` to your domain
-3. Update GitHub OAuth App callback URL to `https://your-domain.com/api/auth/callback/github`
+3. If legacy GitHub OAuth compatibility remains enabled, update its callback URL to `https://your-domain.com/api/auth/callback/github`
 4. SSL provisioned automatically via Let's Encrypt
 
 ---

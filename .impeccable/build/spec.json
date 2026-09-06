@@ -1,0 +1,1104 @@
+{
+  "tool": "comp-spec",
+  "version": 1,
+  "createdAt": "2026-09-04T16:44:01.734Z",
+  "comp": ".impeccable/mocks/dispatch-label-c.png",
+  "warnings": [],
+  "uncoveredInkCells": [],
+  "compSize": {
+    "width": 1672,
+    "height": 941
+  },
+  "aspect": 1.7768,
+  "orientation": "landscape",
+  "palette": [
+    {
+      "hex": "#f8f7e8",
+      "coverage": 0.8877
+    },
+    {
+      "hex": "#0b0a0a",
+      "coverage": 0.0595
+    },
+    {
+      "hex": "#f86208",
+      "coverage": 0.0275
+    },
+    {
+      "hex": "#6a6863",
+      "coverage": 0.0156
+    },
+    {
+      "hex": "#9f9d98",
+      "coverage": 0.0096
+    }
+  ],
+  "bands": [
+    {
+      "y": 0.0694,
+      "strength": 0.256
+    },
+    {
+      "y": 0.0972,
+      "strength": 0.2486
+    },
+    {
+      "y": 0.1389,
+      "strength": 0.2711
+    },
+    {
+      "y": 0.2222,
+      "strength": 0.4093
+    },
+    {
+      "y": 0.2778,
+      "strength": 0.4229
+    },
+    {
+      "y": 0.3611,
+      "strength": 0.7488
+    },
+    {
+      "y": 0.4167,
+      "strength": 0.3903
+    },
+    {
+      "y": 0.4722,
+      "strength": 0.5363
+    },
+    {
+      "y": 0.5972,
+      "strength": 0.5083
+    },
+    {
+      "y": 0.6389,
+      "strength": 0.4557
+    },
+    {
+      "y": 0.9583,
+      "strength": 0.4413
+    },
+    {
+      "y": 0.9861,
+      "strength": 0.3317
+    }
+  ],
+  "regions": [
+    {
+      "id": "paper-texture",
+      "kind": "texture",
+      "note": "clean warm thermal paper grain sample with no ink",
+      "grid": "G1:G2",
+      "box": {
+        "x": 0.6,
+        "y": 0.1,
+        "w": 0.1,
+        "h": 0.2
+      },
+      "px": {
+        "x": 1003,
+        "y": 94,
+        "w": 167,
+        "h": 188
+      },
+      "aspect": 0.8883,
+      "palette": [
+        {
+          "hex": "#f8f8e8",
+          "coverage": 1
+        }
+      ],
+      "detail": {
+        "energy": 0.4319
+      },
+      "medium": "raster",
+      "plate": "assets/plates/paper-texture.png",
+      "text": null
+    },
+    {
+      "id": "topbar-rule",
+      "kind": "chrome",
+      "note": "thin black navigation baseline and vertical registration dividers",
+      "grid": "A0:J0",
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 0.1
+      },
+      "px": {
+        "x": 0,
+        "y": 0,
+        "w": 1672,
+        "h": 94
+      },
+      "aspect": 17.7872,
+      "palette": [
+        {
+          "hex": "#f8f7e8",
+          "coverage": 0.8068
+        },
+        {
+          "hex": "#f86608",
+          "coverage": 0.107
+        },
+        {
+          "hex": "#0f0d0a",
+          "coverage": 0.0632
+        },
+        {
+          "hex": "#71716b",
+          "coverage": 0.0162
+        },
+        {
+          "hex": "#b0b0a8",
+          "coverage": 0.0067
+        }
+      ],
+      "detail": {
+        "energy": 38.9453
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "brand",
+      "kind": "text",
+      "note": "small bold shrten wordmark",
+      "grid": "A0:A0",
+      "box": {
+        "x": 0.032,
+        "y": 0.025,
+        "w": 0.074,
+        "h": 0.04
+      },
+      "px": {
+        "x": 54,
+        "y": 24,
+        "w": 124,
+        "h": 38
+      },
+      "aspect": 3.2632,
+      "palette": [
+        {
+          "hex": "#f6f4e9",
+          "coverage": 0.6771
+        },
+        {
+          "hex": "#0d0d0d",
+          "coverage": 0.1872
+        },
+        {
+          "hex": "#b4b3aa",
+          "coverage": 0.0679
+        },
+        {
+          "hex": "#7c7a74",
+          "coverage": 0.0349
+        },
+        {
+          "hex": "#484644",
+          "coverage": 0.033
+        }
+      ],
+      "detail": {
+        "energy": 35.873
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 1,
+          "glyphs": 6,
+          "capHeightPx": 26.7,
+          "inkIsDark": true,
+          "allCaps": false,
+          "advance": 0.6555,
+          "advTall": 0.6555,
+          "advX": 0.6555,
+          "gap": 0.0749,
+          "xRatio": 0.7243,
+          "stemW": 0.2041,
+          "contrast": 1.2371,
+          "serif": null,
+          "densTall": 0.5279,
+          "densX": 0.6357,
+          "weight": 0.5279
+        },
+        "widthClass": "normal",
+        "weightClass": "medium"
+      }
+    },
+    {
+      "id": "theme-control",
+      "kind": "control",
+      "note": "small square theme icon control",
+      "grid": "B0:B0",
+      "box": {
+        "x": 0.145,
+        "y": 0.014,
+        "w": 0.037,
+        "h": 0.056
+      },
+      "px": {
+        "x": 242,
+        "y": 13,
+        "w": 62,
+        "h": 53
+      },
+      "aspect": 1.1698,
+      "palette": [
+        {
+          "hex": "#090808",
+          "coverage": 0.4841
+        },
+        {
+          "hex": "#f7f5e9",
+          "coverage": 0.4392
+        },
+        {
+          "hex": "#a9a9a0",
+          "coverage": 0.0476
+        },
+        {
+          "hex": "#413f3f",
+          "coverage": 0.0185
+        },
+        {
+          "hex": "#707068",
+          "coverage": 0.0106
+        }
+      ],
+      "detail": {
+        "energy": 10.5112
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "get-started",
+      "kind": "control",
+      "note": "orange rectangular Get started action at top right",
+      "grid": "I0:J0",
+      "box": {
+        "x": 0.856,
+        "y": 0,
+        "w": 0.144,
+        "h": 0.084
+      },
+      "px": {
+        "x": 1431,
+        "y": 0,
+        "w": 241,
+        "h": 79
+      },
+      "aspect": 3.0506,
+      "palette": [
+        {
+          "hex": "#f86608",
+          "coverage": 0.8884
+        },
+        {
+          "hex": "#361a0a",
+          "coverage": 0.0411
+        },
+        {
+          "hex": "#d34b08",
+          "coverage": 0.0307
+        },
+        {
+          "hex": "#0d0808",
+          "coverage": 0.0241
+        },
+        {
+          "hex": "#552309",
+          "coverage": 0.0156
+        }
+      ],
+      "detail": {
+        "energy": 11.0672
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "headline",
+      "kind": "text",
+      "note": "large condensed black headline Pack a long URL into a link that travels",
+      "grid": "A1:E3",
+      "box": {
+        "x": 0.03,
+        "y": 0.115,
+        "w": 0.44,
+        "h": 0.25
+      },
+      "px": {
+        "x": 50,
+        "y": 108,
+        "w": 736,
+        "h": 235
+      },
+      "aspect": 3.1319,
+      "palette": [
+        {
+          "hex": "#f7f5e8",
+          "coverage": 0.6234
+        },
+        {
+          "hex": "#080808",
+          "coverage": 0.3239
+        },
+        {
+          "hex": "#a2a29b",
+          "coverage": 0.0237
+        },
+        {
+          "hex": "#6b6a65",
+          "coverage": 0.0162
+        },
+        {
+          "hex": "#383734",
+          "coverage": 0.0129
+        }
+      ],
+      "detail": {
+        "energy": 80.4229
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 2,
+          "glyphs": 32,
+          "capHeightPx": 95.4,
+          "inkIsDark": true,
+          "allCaps": false,
+          "advance": 0.3323,
+          "advTall": 0.2389,
+          "advX": 0.3323,
+          "gap": 0.0727,
+          "xRatio": 0.811,
+          "stemW": 0.14,
+          "contrast": 1.0843,
+          "serif": 1.0025,
+          "densTall": 0.7314,
+          "densX": 0.8134,
+          "weight": 0.7314
+        },
+        "widthClass": "compressed",
+        "weightClass": "black",
+        "chosen": {
+          "family": "Antonio",
+          "weight": 400,
+          "fontSizePx": 136,
+          "source": "catalog",
+          "estimatedSize": true,
+          "stamp": "96a66ca49d0b"
+        }
+      }
+    },
+    {
+      "id": "hero-perforation",
+      "kind": "chrome",
+      "note": "vertical dashed perforation with semicircle notches",
+      "grid": "F0:F3",
+      "box": {
+        "x": 0.5,
+        "y": 0,
+        "w": 0.1,
+        "h": 0.4
+      },
+      "px": {
+        "x": 836,
+        "y": 0,
+        "w": 167,
+        "h": 376
+      },
+      "aspect": 0.4441,
+      "palette": [
+        {
+          "hex": "#f8f8e8",
+          "coverage": 0.9819
+        },
+        {
+          "hex": "#18130e",
+          "coverage": 0.0084
+        },
+        {
+          "hex": "#72706a",
+          "coverage": 0.008
+        },
+        {
+          "hex": "#989188",
+          "coverage": 0.0017
+        }
+      ],
+      "detail": {
+        "energy": 3.3586
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "no-account",
+      "kind": "text",
+      "note": "small monospace No account required note framed by cobalt corner marks",
+      "grid": "H2:J3",
+      "box": {
+        "x": 0.812,
+        "y": 0.304,
+        "w": 0.16,
+        "h": 0.06
+      },
+      "px": {
+        "x": 1358,
+        "y": 286,
+        "w": 268,
+        "h": 56
+      },
+      "aspect": 4.7857,
+      "palette": [
+        {
+          "hex": "#f7f6e8",
+          "coverage": 0.9192
+        },
+        {
+          "hex": "#10100e",
+          "coverage": 0.0269
+        },
+        {
+          "hex": "#aba99f",
+          "coverage": 0.021
+        },
+        {
+          "hex": "#7d7b78",
+          "coverage": 0.0174
+        },
+        {
+          "hex": "#ceced6",
+          "coverage": 0.0156
+        }
+      ],
+      "detail": {
+        "energy": 31.1276
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 1,
+          "glyphs": 17,
+          "capHeightPx": 14.4,
+          "inkIsDark": true,
+          "allCaps": false,
+          "advance": 0.623,
+          "advTall": 0.6576,
+          "advX": 0.6057,
+          "gap": 0.1385,
+          "xRatio": 0.7387,
+          "stemW": 0.1646,
+          "contrast": 1.0451,
+          "serif": null,
+          "densTall": 0.4589,
+          "densX": 0.5669,
+          "weight": 0.4589
+        },
+        "widthClass": "normal",
+        "weightClass": "regular"
+      }
+    },
+    {
+      "id": "destination-band",
+      "kind": "chrome",
+      "note": "full-width ruled destination strip with black frame and cobalt registration marks",
+      "grid": "A4:J5",
+      "box": {
+        "x": 0,
+        "y": 0.4,
+        "w": 1,
+        "h": 0.2
+      },
+      "px": {
+        "x": 0,
+        "y": 376,
+        "w": 1672,
+        "h": 188
+      },
+      "aspect": 8.8936,
+      "palette": [
+        {
+          "hex": "#f7f6e8",
+          "coverage": 0.8602
+        },
+        {
+          "hex": "#f86008",
+          "coverage": 0.0871
+        },
+        {
+          "hex": "#82807d",
+          "coverage": 0.0198
+        },
+        {
+          "hex": "#343434",
+          "coverage": 0.0165
+        },
+        {
+          "hex": "#100f0d",
+          "coverage": 0.0164
+        }
+      ],
+      "detail": {
+        "energy": 28.9928
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "destination-label",
+      "kind": "text",
+      "note": "small monospace Destination URL label",
+      "grid": "A4:B4",
+      "box": {
+        "x": 0.05,
+        "y": 0.442,
+        "w": 0.105,
+        "h": 0.026
+      },
+      "px": {
+        "x": 84,
+        "y": 416,
+        "w": 176,
+        "h": 24
+      },
+      "aspect": 7.3333,
+      "palette": [
+        {
+          "hex": "#f7f4e9",
+          "coverage": 0.8668
+        },
+        {
+          "hex": "#afafa6",
+          "coverage": 0.059
+        },
+        {
+          "hex": "#2a2927",
+          "coverage": 0.0306
+        },
+        {
+          "hex": "#5c5a5a",
+          "coverage": 0.0284
+        },
+        {
+          "hex": "#cdcfd3",
+          "coverage": 0.0153
+        }
+      ],
+      "detail": {
+        "energy": 40.3329
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 1,
+          "glyphs": 15,
+          "capHeightPx": 12.1,
+          "inkIsDark": true,
+          "allCaps": false,
+          "advance": 0.607,
+          "advTall": 0.607,
+          "advX": 0.6208,
+          "gap": 0.138,
+          "xRatio": 0.7351,
+          "stemW": 0.1688,
+          "contrast": 1.0285,
+          "serif": 0.2362,
+          "densTall": 0.4298,
+          "densX": 0.5843,
+          "weight": 0.4298
+        },
+        "widthClass": "normal",
+        "weightClass": "regular"
+      }
+    },
+    {
+      "id": "destination-input",
+      "kind": "control",
+      "note": "very large destination URL input containing the example URL placeholder",
+      "grid": "A5:H5",
+      "box": {
+        "x": 0.045,
+        "y": 0.482,
+        "w": 0.716,
+        "h": 0.103
+      },
+      "px": {
+        "x": 75,
+        "y": 454,
+        "w": 1197,
+        "h": 97
+      },
+      "aspect": 12.3402,
+      "palette": [
+        {
+          "hex": "#f7f5e7",
+          "coverage": 0.8869
+        },
+        {
+          "hex": "#838180",
+          "coverage": 0.0426
+        },
+        {
+          "hex": "#b0aba6",
+          "coverage": 0.0366
+        },
+        {
+          "hex": "#3b3a39",
+          "coverage": 0.0312
+        },
+        {
+          "hex": "#080808",
+          "coverage": 0.0026
+        }
+      ],
+      "detail": {
+        "energy": 19.9458
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "shorten-button",
+      "kind": "control",
+      "note": "single orange Shorten link button with right arrow",
+      "grid": "H5:J5",
+      "box": {
+        "x": 0.76,
+        "y": 0.482,
+        "w": 0.191,
+        "h": 0.103
+      },
+      "px": {
+        "x": 1271,
+        "y": 454,
+        "w": 319,
+        "h": 97
+      },
+      "aspect": 3.2887,
+      "palette": [
+        {
+          "hex": "#f86008",
+          "coverage": 0.8621
+        },
+        {
+          "hex": "#0a0808",
+          "coverage": 0.0428
+        },
+        {
+          "hex": "#511908",
+          "coverage": 0.0411
+        },
+        {
+          "hex": "#7a796b",
+          "coverage": 0.0393
+        },
+        {
+          "hex": "#310e08",
+          "coverage": 0.0147
+        }
+      ],
+      "detail": {
+        "energy": 15.1193
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "options-frame",
+      "kind": "chrome",
+      "note": "black outlined link-options manifest with clipped lower corners and horizontal row rules",
+      "grid": "A6:D9",
+      "box": {
+        "x": 0,
+        "y": 0.6,
+        "w": 0.4,
+        "h": 0.4
+      },
+      "px": {
+        "x": 0,
+        "y": 565,
+        "w": 669,
+        "h": 376
+      },
+      "aspect": 1.7793,
+      "palette": [
+        {
+          "hex": "#f8f6e8",
+          "coverage": 0.9219
+        },
+        {
+          "hex": "#0a0b0a",
+          "coverage": 0.0295
+        },
+        {
+          "hex": "#9d9c97",
+          "coverage": 0.0236
+        },
+        {
+          "hex": "#605f59",
+          "coverage": 0.0152
+        },
+        {
+          "hex": "#cecac1",
+          "coverage": 0.0098
+        }
+      ],
+      "detail": {
+        "energy": 21.393
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "options-disclosure",
+      "kind": "control",
+      "note": "Link options disclosure row with cobalt downward chevron",
+      "grid": "A6:D6",
+      "box": {
+        "x": 0.025,
+        "y": 0.64,
+        "w": 0.36,
+        "h": 0.056
+      },
+      "px": {
+        "x": 42,
+        "y": 602,
+        "w": 602,
+        "h": 53
+      },
+      "aspect": 11.3585,
+      "palette": [
+        {
+          "hex": "#f7f6e8",
+          "coverage": 0.8689
+        },
+        {
+          "hex": "#3c3e39",
+          "coverage": 0.061
+        },
+        {
+          "hex": "#a9aaa7",
+          "coverage": 0.0584
+        },
+        {
+          "hex": "#0b0b0b",
+          "coverage": 0.0089
+        },
+        {
+          "hex": "#737370",
+          "coverage": 0.0028
+        }
+      ],
+      "detail": {
+        "energy": 30.2718
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "custom-alias-row",
+      "kind": "control",
+      "note": "Custom alias option row",
+      "grid": "A7:D7",
+      "box": {
+        "x": 0.025,
+        "y": 0.696,
+        "w": 0.36,
+        "h": 0.062
+      },
+      "px": {
+        "x": 42,
+        "y": 655,
+        "w": 602,
+        "h": 58
+      },
+      "aspect": 10.3793,
+      "palette": [
+        {
+          "hex": "#f8f7e8",
+          "coverage": 0.9281
+        },
+        {
+          "hex": "#a09e99",
+          "coverage": 0.0368
+        },
+        {
+          "hex": "#cfccc3",
+          "coverage": 0.0193
+        },
+        {
+          "hex": "#10100f",
+          "coverage": 0.01
+        },
+        {
+          "hex": "#706e68",
+          "coverage": 0.0058
+        }
+      ],
+      "detail": {
+        "energy": 14.0394
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "password-row",
+      "kind": "control",
+      "note": "Password option row below custom alias",
+      "grid": "A7:D8",
+      "box": {
+        "x": 0.025,
+        "y": 0.758,
+        "w": 0.36,
+        "h": 0.062
+      },
+      "px": {
+        "x": 42,
+        "y": 713,
+        "w": 602,
+        "h": 58
+      },
+      "aspect": 10.3793,
+      "palette": [
+        {
+          "hex": "#f7f6e9",
+          "coverage": 0.9767
+        },
+        {
+          "hex": "#b8b6af",
+          "coverage": 0.0098
+        },
+        {
+          "hex": "#8b8782",
+          "coverage": 0.0058
+        },
+        {
+          "hex": "#0d0d0d",
+          "coverage": 0.0053
+        },
+        {
+          "hex": "#484848",
+          "coverage": 0.0025
+        }
+      ],
+      "detail": {
+        "energy": 13.9373
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "expiration-row",
+      "kind": "control",
+      "note": "Expiration option row",
+      "grid": "A8:D8",
+      "box": {
+        "x": 0.025,
+        "y": 0.82,
+        "w": 0.36,
+        "h": 0.062
+      },
+      "px": {
+        "x": 42,
+        "y": 772,
+        "w": 602,
+        "h": 58
+      },
+      "aspect": 10.3793,
+      "palette": [
+        {
+          "hex": "#f8f6e8",
+          "coverage": 0.9314
+        },
+        {
+          "hex": "#97948d",
+          "coverage": 0.035
+        },
+        {
+          "hex": "#cbc6bf",
+          "coverage": 0.0203
+        },
+        {
+          "hex": "#131312",
+          "coverage": 0.009
+        },
+        {
+          "hex": "#484848",
+          "coverage": 0.0043
+        }
+      ],
+      "detail": {
+        "energy": 14.3288
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "geo-row",
+      "kind": "control",
+      "note": "Geographic redirects option row",
+      "grid": "A9:D9",
+      "box": {
+        "x": 0.025,
+        "y": 0.882,
+        "w": 0.36,
+        "h": 0.062
+      },
+      "px": {
+        "x": 42,
+        "y": 830,
+        "w": 602,
+        "h": 58
+      },
+      "aspect": 10.3793,
+      "palette": [
+        {
+          "hex": "#f7f6e8",
+          "coverage": 0.9556
+        },
+        {
+          "hex": "#b1b1a9",
+          "coverage": 0.0215
+        },
+        {
+          "hex": "#11110f",
+          "coverage": 0.0107
+        },
+        {
+          "hex": "#6b6b68",
+          "coverage": 0.0085
+        },
+        {
+          "hex": "#3b3b35",
+          "coverage": 0.0037
+        }
+      ],
+      "detail": {
+        "energy": 17.7513
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "center-perforation",
+      "kind": "chrome",
+      "note": "vertical ticket perforation with holes and center seam",
+      "grid": "E6:E9",
+      "box": {
+        "x": 0.4,
+        "y": 0.6,
+        "w": 0.1,
+        "h": 0.4
+      },
+      "px": {
+        "x": 669,
+        "y": 565,
+        "w": 167,
+        "h": 376
+      },
+      "aspect": 0.4441,
+      "palette": [
+        {
+          "hex": "#f8f6e8",
+          "coverage": 0.9592
+        },
+        {
+          "hex": "#1b1c1a",
+          "coverage": 0.0235
+        },
+        {
+          "hex": "#d0cdca",
+          "coverage": 0.007
+        },
+        {
+          "hex": "#96968f",
+          "coverage": 0.006
+        },
+        {
+          "hex": "#444242",
+          "coverage": 0.0043
+        }
+      ],
+      "detail": {
+        "energy": 12.0467
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "result-tray",
+      "kind": "chrome",
+      "note": "large blank clipped-corner result handoff tray with two faint cobalt writing rules",
+      "grid": "E6:J9",
+      "box": {
+        "x": 0.4,
+        "y": 0.6,
+        "w": 0.6,
+        "h": 0.4
+      },
+      "px": {
+        "x": 669,
+        "y": 565,
+        "w": 1003,
+        "h": 376
+      },
+      "aspect": 2.6676,
+      "palette": [
+        {
+          "hex": "#f8f7e8",
+          "coverage": 0.9704
+        },
+        {
+          "hex": "#0d0d0d",
+          "coverage": 0.0206
+        },
+        {
+          "hex": "#7f8078",
+          "coverage": 0.0067
+        },
+        {
+          "hex": "#8fa8d8",
+          "coverage": 0.0018
+        },
+        {
+          "hex": "#282818",
+          "coverage": 0.0005
+        }
+      ],
+      "detail": {
+        "energy": 12.9914
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    }
+  ]
+}
