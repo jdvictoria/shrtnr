@@ -16,6 +16,7 @@ import {
 import { Loader2, Pencil, X } from "lucide-react";
 import { editLink } from "@/lib/actions";
 import { toast } from "sonner";
+import { localDateTimeToIso, toDateTimeLocalValue } from "@/lib/datetime";
 
 type Tag = { id: string; name: string; color: string };
 type Folder = { id: string; name: string; color: string };
@@ -39,6 +40,7 @@ interface EditLinkDialogProps {
     notes: string | null;
     folderId: string | null;
     tagIds: string[];
+    expiresAt: Date | null;
   }) => void;
 }
 
@@ -64,7 +66,7 @@ export function EditLinkDialog({
   );
   const [expiresAt, setExpiresAt] = useState(
     link.expiresAt
-      ? new Date(link.expiresAt).toISOString().slice(0, 16)
+      ? toDateTimeLocalValue(link.expiresAt)
       : ""
   );
   const [isPending, startTransition] = useTransition();
@@ -76,13 +78,18 @@ export function EditLinkDialog({
   }
 
   function handleSave() {
+    const normalizedExpiry = expiresAt ? localDateTimeToIso(expiresAt) : null;
+    if (expiresAt && !normalizedExpiry) {
+      toast.error("Enter a valid expiration date");
+      return;
+    }
     startTransition(async () => {
       const res = await editLink(link.id, {
         url: url.trim() || undefined,
         notes: notes.trim() || undefined,
         folderId: folderId || null,
         tagIds: selectedTagIds,
-        expiresAt: expiresAt || null,
+        expiresAt: normalizedExpiry,
       });
       if (!res.success) {
         toast.error(res.error);
@@ -94,6 +101,7 @@ export function EditLinkDialog({
         notes: notes.trim() || null,
         folderId: folderId || null,
         tagIds: selectedTagIds,
+        expiresAt: res.data.expiresAt,
       });
       setOpen(false);
     });
@@ -103,7 +111,7 @@ export function EditLinkDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       {!isControlled && (
         <DialogTrigger asChild>
-          <Button size="icon" variant="ghost" className="h-8 w-8">
+          <Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Edit link">
             <Pencil className="h-4 w-4" />
           </Button>
         </DialogTrigger>
@@ -112,7 +120,7 @@ export function EditLinkDialog({
         <DialogHeader>
           <DialogTitle>Edit Link</DialogTitle>
           <DialogDescription>
-            Update the destination URL, notes, folder and tags.
+            Update the destination URL, organization and expiration.
           </DialogDescription>
         </DialogHeader>
 
@@ -141,17 +149,18 @@ export function EditLinkDialog({
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Internal notes about this link..."
               rows={2}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+              className="w-full rounded-none border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
             />
           </div>
 
           {folders.length > 0 && (
             <div className="space-y-1.5">
-              <Label>Folder</Label>
+              <Label htmlFor="edit-folder">Folder</Label>
               <select
+                id="edit-folder"
                 value={folderId}
                 onChange={(e) => setFolderId(e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="w-full rounded-none border border-input bg-background px-3 py-2 text-sm"
               >
                 <option value="">No folder</option>
                 {folders.map((f) => (
@@ -174,7 +183,8 @@ export function EditLinkDialog({
                       key={tag.id}
                       type="button"
                       onClick={() => toggleTag(tag.id)}
-                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium border transition-colors ${
+                      aria-pressed={selected}
+                      className={`inline-flex items-center gap-1 rounded-none px-2.5 py-0.5 font-mono text-xs font-medium border transition-colors ${
                         selected
                           ? "border-transparent text-white"
                           : "border-border text-muted-foreground hover:text-foreground"
@@ -208,13 +218,14 @@ export function EditLinkDialog({
               type="datetime-local"
               value={expiresAt}
               onChange={(e) => setExpiresAt(e.target.value)}
-              min={new Date(Date.now() + 60_000).toISOString().slice(0, 16)}
+              min={toDateTimeLocalValue(new Date(Date.now() + 60_000))}
             />
             {expiresAt && (
               <button
                 type="button"
                 className="text-xs text-muted-foreground hover:text-foreground"
                 onClick={() => setExpiresAt("")}
+                aria-label="Clear expiration date"
               >
                 Remove expiration
               </button>

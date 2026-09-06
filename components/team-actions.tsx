@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,8 +13,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Check, Copy, Loader2, Mail, Trash2 } from "lucide-react";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { AlertTriangle, Check, Copy, Loader2, Mail, Trash2 } from "lucide-react";
+import {
+  deleteTeam,
   inviteMember,
   updateMemberRole,
   removeMember,
@@ -78,6 +87,9 @@ export function TeamActions({
 
   const isAdmin = myRole === "admin";
 
+  useEffect(() => setMembers(initialMembers), [initialMembers]);
+  useEffect(() => setInvitations(initialInvitations), [initialInvitations]);
+
   function handleInvite() {
     if (!inviteEmail.trim()) return;
     startTransition(async () => {
@@ -108,6 +120,7 @@ export function TeamActions({
         prev.map((m) => (m.id === memberId ? { ...m, role } : m))
       );
       toast.success("Role updated");
+      router.refresh();
     });
   }
 
@@ -122,6 +135,7 @@ export function TeamActions({
       }
       setMembers((prev) => prev.filter((m) => m.id !== memberId));
       toast.success("Member removed");
+      router.refresh();
       setRemovingId(null);
     });
   }
@@ -145,7 +159,7 @@ export function TeamActions({
           {members.map((member) => (
             <div
               key={member.id}
-              className="flex items-center justify-between gap-3 rounded-lg border px-4 py-3"
+              className="flex items-center justify-between gap-3 border px-4 py-3"
             >
               <div className="flex items-center gap-3 min-w-0">
                 {member.user.image ? (
@@ -186,7 +200,10 @@ export function TeamActions({
                     }
                     disabled={isPending}
                   >
-                    <SelectTrigger className="h-7 w-24 text-xs">
+                    <SelectTrigger
+                      className="h-7 w-24 text-xs"
+                      aria-label={`Role for ${member.user.name ?? member.user.email ?? "team member"}`}
+                    >
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -208,6 +225,7 @@ export function TeamActions({
                     className="h-7 w-7 text-muted-foreground hover:text-destructive"
                     onClick={() => handleRemove(member.id)}
                     disabled={removingId === member.id || isPending}
+                    aria-label={`Remove ${member.user.name ?? member.user.email ?? "team member"}`}
                   >
                     {removingId === member.id ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -228,8 +246,8 @@ export function TeamActions({
           <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">
             Invite Member
           </h3>
-          <div className="rounded-lg border p-4 space-y-3">
-            <div className="flex gap-2">
+          <div className="border p-4 space-y-3">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <div className="flex-1 space-y-1.5">
                 <Label htmlFor="invite-email">Email address</Label>
                 <Input
@@ -241,13 +259,13 @@ export function TeamActions({
                   onKeyDown={(e) => e.key === "Enter" && handleInvite()}
                 />
               </div>
-              <div className="w-32 space-y-1.5">
-                <Label>Role</Label>
+              <div className="space-y-1.5 sm:w-32">
+                <Label htmlFor="invite-role">Role</Label>
                 <Select
                   value={inviteRole}
                   onValueChange={(v) => setInviteRole(v as TeamRole)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="invite-role">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -288,7 +306,7 @@ export function TeamActions({
             {invitations.map((inv) => (
               <div
                 key={inv.id}
-                className="flex items-center justify-between gap-3 rounded-lg border px-4 py-3"
+                className="flex items-center justify-between gap-3 border px-4 py-3"
               >
                 <div className="min-w-0">
                   <p className="text-sm font-medium truncate">{inv.email}</p>
@@ -304,7 +322,7 @@ export function TeamActions({
                   onClick={() => copyInviteLink(inv.token)}
                 >
                   {copiedToken === inv.token ? (
-                    <Check className="h-3.5 w-3.5 mr-1 text-green-500" />
+                    <Check className="h-3.5 w-3.5 mr-1 text-success" />
                   ) : (
                     <Copy className="h-3.5 w-3.5 mr-1" />
                   )}
@@ -316,5 +334,62 @@ export function TeamActions({
         </div>
       )}
     </div>
+  );
+}
+
+export function DeleteTeamButton({
+  teamId,
+  teamName,
+}: {
+  teamId: string;
+  teamName: string;
+}) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  function handleDelete() {
+    startTransition(async () => {
+      const result = await deleteTeam(teamId);
+      if (!result.success) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Team deleted. Its links are now personal links.");
+      setOpen(false);
+      router.push("/dashboard/teams");
+      router.refresh();
+    });
+  }
+
+  return (
+    <>
+      <Button variant="outline" size="sm" onClick={() => setOpen(true)} className="text-destructive hover:text-destructive">
+        <Trash2 className="h-4 w-4 mr-1.5" />
+        Delete team
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" aria-hidden="true" />
+              Delete {teamName}?
+            </DialogTitle>
+            <DialogDescription>
+              Members and pending invitations will lose access. Shared links will be retained as personal links owned by their creators.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setOpen(false)} disabled={isPending}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={isPending}>
+              {isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Delete team
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

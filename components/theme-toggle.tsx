@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, SunMoon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
@@ -11,7 +11,13 @@ export function ThemeToggle() {
 
   // Avoid hydration mismatch
   useEffect(() => setMounted(true), []);
-  if (!mounted) return <div className="h-9 w-9" />;
+  if (!mounted) {
+    return (
+      <div className="h-9 w-9 grid place-items-center" aria-hidden="true">
+        <SunMoon className="h-4 w-4" />
+      </div>
+    );
+  }
 
   return (
     <Button
@@ -19,7 +25,7 @@ export function ThemeToggle() {
       size="icon"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       aria-label="Toggle theme"
-      className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary transition-colors"
+      className="h-9 w-9 rounded-none hover:bg-primary/10 hover:text-primary transition-colors"
     >
       {theme === "dark" ? (
         <Sun className="h-4 w-4 transition-transform duration-200 rotate-0" />

@@ -7,53 +7,54 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 import Link from "next/link";
-import { Github } from "lucide-react";
-import { signIn } from "@/auth";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { CredentialsForm } from "@/components/credentials-form";
+import { authEntryHref, resolveAuthCallback } from "@/lib/auth-redirect";
 
-export default function SignInPage() {
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ callbackUrl?: string }>;
+}) {
+  const { callbackUrl } = await searchParams;
+  const destination = resolveAuthCallback(callbackUrl);
+
   return (
-    <div className="w-full flex justify-center px-4 py-12">
-      <Card className="w-full max-w-xl">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Welcome back</CardTitle>
-          <CardDescription>Sign in to manage your links</CardDescription>
+    <div className="dispatch-auth-page">
+      <Card className="dispatch-auth-ticket">
+        <CardHeader>
+          <h1 className="dispatch-auth-ticket__title">Welcome back</h1>
+          <p className="dispatch-auth-ticket__code">ACCESS / RETURNING OPERATOR</p>
+          <CardDescription>Use your email and password to open your link ledger.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {/* GitHub OAuth — form action triggers server-side signIn */}
-          <form
-            action={async () => {
-              "use server";
-              await signIn("github", { redirectTo: "/dashboard" });
-            }}
-          >
-            <Button type="submit" variant="outline" className="w-full gap-2">
-              <Github className="h-4 w-4" />
-              Continue with GitHub
-            </Button>
-          </form>
-
-          <div className="relative flex items-center gap-2">
-            <Separator className="flex-1" />
-            <span className="text-xs text-muted-foreground">or</span>
-            <Separator className="flex-1" />
-          </div>
-
+        <CardContent className="space-y-5">
           <Suspense>
             <CredentialsForm />
           </Suspense>
 
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="dispatch-auth-switch text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
-            <Link href="/sign-up" className="text-primary hover:underline font-medium">
+            <Link
+              href={authEntryHref("/sign-up", destination)}
+              className="text-primary hover:underline font-medium"
+            >
               Sign up
             </Link>
           </p>
         </CardContent>
       </Card>
+      <aside className="dispatch-auth-context" aria-label="Account benefits">
+        <h2>Keep every handoff on record.</h2>
+        <p className="dispatch-auth-context__mark">shrten / account access</p>
+        <p>
+          Sign in to organize short links, inspect traffic, and work from shared team ledgers.
+        </p>
+        <ol>
+          <li><span>01</span> Issue and edit links</li>
+          <li><span>02</span> Read click activity</li>
+          <li><span>03</span> Route team work</li>
+        </ol>
+      </aside>
     </div>
   );
 }

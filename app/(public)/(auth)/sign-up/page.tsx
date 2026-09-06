@@ -7,52 +7,54 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 import Link from "next/link";
-import { Github } from "lucide-react";
-import { signIn } from "@/auth";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { SignUpForm } from "@/components/sign-up-form";
+import { authEntryHref, resolveAuthCallback } from "@/lib/auth-redirect";
 
-export default function SignUpPage() {
+export default async function SignUpPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ callbackUrl?: string }>;
+}) {
+  const { callbackUrl } = await searchParams;
+  const destination = resolveAuthCallback(callbackUrl);
+
   return (
-    <div className="w-full flex justify-center px-4 py-12">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Create an account</CardTitle>
-          <CardDescription>Start managing and tracking your short links</CardDescription>
+    <div className="dispatch-auth-page">
+      <Card className="dispatch-auth-ticket">
+        <CardHeader>
+          <h1 className="dispatch-auth-ticket__title">Create an account</h1>
+          <p className="dispatch-auth-ticket__code">ACCESS / NEW OPERATOR</p>
+          <CardDescription>Create your credentials to start managing short links.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <form
-            action={async () => {
-              "use server";
-              await signIn("github", { redirectTo: "/dashboard" });
-            }}
-          >
-            <Button type="submit" variant="outline" className="w-full gap-2">
-              <Github className="h-4 w-4" />
-              Continue with GitHub
-            </Button>
-          </form>
-
-          <div className="relative flex items-center gap-2">
-            <Separator className="flex-1" />
-            <span className="text-xs text-muted-foreground">or</span>
-            <Separator className="flex-1" />
-          </div>
-
+        <CardContent className="space-y-5">
           <Suspense>
             <SignUpForm />
           </Suspense>
 
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="dispatch-auth-switch text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link href="/sign-in" className="text-primary hover:underline font-medium">
+            <Link
+              href={authEntryHref("/sign-in", destination)}
+              className="text-primary hover:underline font-medium"
+            >
               Sign in
             </Link>
           </p>
         </CardContent>
       </Card>
+      <aside className="dispatch-auth-context" aria-label="Account workflow">
+        <h2>Turn one short link into a working ledger.</h2>
+        <p className="dispatch-auth-context__mark">shrten / new operator</p>
+        <p>
+          Create an account to keep links together, understand their traffic, and share ownership with a team.
+        </p>
+        <ol>
+          <li><span>01</span> Create your account</li>
+          <li><span>02</span> Add or claim links</li>
+          <li><span>03</span> Organize the work</li>
+        </ol>
+      </aside>
     </div>
   );
 }

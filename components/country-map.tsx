@@ -32,17 +32,17 @@ const ISO2_TO_NUMERIC: Record<string, number> = {
 };
 
 const GEO_URL =
-  "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+  "/assets/data/countries-110m.json";
 
 interface CountryMapProps {
   data: { name: string; count: number }[];
 }
 
 function getColor(count: number, max: number): string {
-  if (count === 0 || max === 0) return "hsl(222, 28%, 14%)";
+  if (count === 0 || max === 0) return "#292822";
   const intensity = count / max;
-  const l = Math.round(45 - intensity * 30); // 45% → 15%
-  return `hsl(190, 95%, ${l}%)`;
+  const lightness = Math.round(82 - intensity * 40);
+  return `hsl(224 64% ${lightness}%)`;
 }
 
 export function CountryMap({ data }: CountryMapProps) {
@@ -69,7 +69,7 @@ export function CountryMap({ data }: CountryMapProps) {
   }
 
   return (
-    <div className="w-full rounded-lg overflow-hidden bg-card border">
+    <div className="w-full overflow-hidden bg-card border">
       <ComposableMap
         projectionConfig={{ scale: 140, center: [0, 20] }}
         style={{ width: "100%", height: "auto" }}
@@ -88,13 +88,13 @@ export function CountryMap({ data }: CountryMapProps) {
                     key={geo.rsmKey}
                     geography={geo}
                     fill={fill}
-                    stroke="hsl(222, 47%, 8%)"
+                    stroke="#0b0a08"
                     strokeWidth={0.4}
                     title={entry ? `${entry.name}: ${entry.count} clicks` : undefined}
                     style={{
                       default: { outline: "none" },
                       hover: {
-                        fill: "hsl(190, 95%, 60%)",
+                        fill: "#7597ff",
                         outline: "none",
                         cursor: entry ? "pointer" : "default",
                       },
@@ -111,10 +111,10 @@ export function CountryMap({ data }: CountryMapProps) {
       <div className="flex items-center justify-end gap-2 px-4 pb-3 text-xs text-muted-foreground">
         <span>0</span>
         <div
-          className="h-2 w-24 rounded"
+          className="h-2 w-24"
           style={{
             background:
-              "linear-gradient(to right, hsl(222, 28%, 14%), hsl(190, 95%, 45%))",
+              "linear-gradient(to right, #292822, #2b56c6)",
           }}
         />
         <span>{max.toLocaleString()} clicks</span>

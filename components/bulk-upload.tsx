@@ -12,6 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 type RowResult = {
   url: string;
@@ -22,6 +23,7 @@ type RowResult = {
 };
 
 export function BulkUpload() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState<RowResult[]>([]);
   const [isPending, startTransition] = useTransition();
@@ -74,6 +76,7 @@ export function BulkUpload() {
 
       const ok = updated.filter((r) => r.status === "success").length;
       toast.success(`${ok} of ${updated.length} links created`);
+      if (ok > 0) router.refresh();
     });
   }
 
@@ -104,7 +107,7 @@ export function BulkUpload() {
           {/* CSV format example */}
           <div className="space-y-1.5">
             <p className="text-xs font-medium text-muted-foreground">Expected format</p>
-            <div className="rounded-md border border-input overflow-hidden text-xs font-mono">
+            <div className="border border-input overflow-hidden text-xs font-mono">
               <table className="w-full">
                 <thead>
                   <tr className="bg-muted border-b border-input">
@@ -170,7 +173,7 @@ export function BulkUpload() {
                     <div className="h-4 w-4 rounded-full border-2 border-muted shrink-0" />
                   )}
                   {row.status === "success" && (
-                    <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-success shrink-0" />
                   )}
                   {row.status === "error" && (
                     <XCircle className="h-4 w-4 text-destructive shrink-0" />

@@ -4,8 +4,6 @@ import { headers } from "next/headers";
 import { ArrowLeft, Link2, Users } from "lucide-react";
 import { auth } from "@/auth";
 import { getTeam, getTeamLinks, getMyRole } from "@/lib/team-actions";
-import { getFolders } from "@/lib/folder-actions";
-import { getTags } from "@/lib/tag-actions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -16,8 +14,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TeamActions } from "@/components/team-actions";
+import { DeleteTeamButton, TeamActions } from "@/components/team-actions";
 import { LinksTable } from "@/components/links-table";
+import { AddLinkDialog } from "@/components/add-link-dialog";
 
 export default async function TeamPage({
   params,
@@ -32,12 +31,10 @@ export default async function TeamPage({
   const { id } = await params;
   const { joined } = await searchParams;
 
-  const [team, myRole, teamLinks, folders, tags] = await Promise.all([
+  const [team, myRole, teamLinks] = await Promise.all([
     getTeam(id),
     getMyRole(id),
     getTeamLinks(id),
-    getFolders(),
-    getTags(),
   ]);
 
   if (!team || !myRole) notFound();
@@ -47,12 +44,11 @@ export default async function TeamPage({
   const proto = h.get("x-forwarded-proto")?.split(",")[0] ?? "http";
   const appUrl = `${proto}://${host}`;
 
-  const folderProps = folders.map(({ id, name, color }) => ({ id, name, color }));
-  const tagProps = tags.map(({ id, name, color }) => ({ id, name, color }));
+  const canManageLinks = myRole === "admin" || myRole === "editor";
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <Button variant="ghost" size="sm" asChild className="-ml-2 mb-4">
+    <div className="dispatch-workspace dispatch-workspace--measure">
+      <Button variant="ghost" size="sm" asChild className="mb-4">
         <Link href="/dashboard/teams">
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Teams
@@ -60,20 +56,18 @@ export default async function TeamPage({
       </Button>
 
       {joined && (
-        <div className="mb-6 rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-400">
+        <div className="mb-6 border border-success/30 bg-success/10 px-4 py-3 text-sm text-success" role="status">
           Welcome to the team!
         </div>
       )}
 
       {/* Header */}
-      <div className="flex items-start justify-between gap-4 mb-8">
+      <div className="dispatch-page-header flex flex-col gap-5 mb-8 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{team.name}</h1>
-          <p className="text-muted-foreground font-mono text-sm mt-0.5">
-            @{team.slug}
-          </p>
+          <h1>{team.name}</h1>
+          <p className="dispatch-page-code">TEAM LEDGER / @{team.slug}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto sm:justify-end">
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <Users className="h-4 w-4" />
             {team.members.length} member{team.members.length !== 1 ? "s" : ""}
@@ -93,6 +87,15 @@ export default async function TeamPage({
           >
             {myRole}
           </Badge>
+          {canManageLinks && (
+            <AddLinkDialog
+              folders={[]}
+              appUrl={appUrl}
+              teamId={team.id}
+              triggerLabel="New team link"
+            />
+          )}
+          {myRole === "admin" && <DeleteTeamButton teamId={team.id} teamName={team.name} />}
         </div>
       </div>
 
@@ -103,7 +106,7 @@ export default async function TeamPage({
         </TabsList>
 
         <TabsContent value="members">
-          <Card>
+          <Card className="dispatch-ledger-panel">
             <CardHeader>
               <CardTitle>Team Members</CardTitle>
               <CardDescription>
@@ -140,9 +143,21 @@ export default async function TeamPage({
 
         <TabsContent value="links">
           {teamLinks.length === 0 ? (
-            <Card>
-              <CardContent className="text-center py-12 text-muted-foreground">
-                No links in this team yet.
+            <Card className="dispatch-ledger-panel">
+              <CardContent className="flex flex-col items-center py-12 text-center">
+                <p className="text-muted-foreground">
+                  {canManageLinks
+                    ? "No team links have been issued yet."
+                    : "No links have been shared with this team yet."}
+                </p>
+                {canManageLinks && (
+                  <AddLinkDialog
+                    folders={[]}
+                    appUrl={appUrl}
+                    teamId={team.id}
+                    triggerLabel="Create the first team link"
+                  />
+                )}
               </CardContent>
             </Card>
           ) : (
@@ -152,11 +167,13 @@ export default async function TeamPage({
                 notes: l.notes ?? null,
                 folder: l.folder ?? null,
               }))}
-              folders={folderProps}
-              tags={tagProps}
+              folders={[]}
+              tags={[]}
               page={1}
               totalPages={1}
               total={teamLinks.length}
+              appUrl={appUrl}
+              canManage={canManageLinks}
             />
           )}
         </TabsContent>

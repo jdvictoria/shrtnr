@@ -34,10 +34,11 @@ export default async function TeamsPage({
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="flex items-center justify-between mb-8">
+    <div className="dispatch-workspace dispatch-workspace--measure">
+      <div className="dispatch-page-header flex items-end justify-between mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Teams</h1>
+          <h1>Teams</h1>
+          <p className="dispatch-page-code">SHARED OPERATIONS / WORKSPACES</p>
           <p className="text-muted-foreground mt-1">
             Collaborate with your team on shared links
           </p>
@@ -51,20 +52,24 @@ export default async function TeamsPage({
       </div>
 
       {joined && (
-        <div className="mb-6 rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-400">
+        <div className="mb-6 border border-success/30 bg-success/10 px-4 py-3 text-sm text-success" role="status">
           You have successfully joined the team.
         </div>
       )}
       {error && (
-        <div className="mb-6 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {error === "invite-failed"
-            ? "Failed to accept invitation. It may have expired."
-            : "Invalid invitation link."}
+        <div className="mb-6 border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive" role="alert">
+          {error === "email-mismatch"
+            ? "This invitation was sent to a different email address. Sign in with the invited account to continue."
+            : error === "invite-expired"
+              ? "This invitation has expired. Ask a team administrator for a new link."
+              : error === "invite-failed"
+                ? "This invitation could not be accepted. Ask a team administrator for a new link."
+                : "Invalid invitation link."}
         </div>
       )}
 
       {teams.length === 0 ? (
-        <Card>
+        <Card className="dispatch-ledger-panel">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
             <Users className="h-12 w-12 text-muted-foreground mb-4" />
             <h2 className="text-xl font-semibold mb-2">No teams yet</h2>
@@ -80,10 +85,10 @@ export default async function TeamsPage({
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="dispatch-team-ledger grid">
           {teams.map((team) => (
             <Link key={team.id} href={`/dashboard/teams/${team.id}`}>
-              <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
+              <Card className="dispatch-team-row hover:border-primary transition-colors cursor-pointer h-full">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div>

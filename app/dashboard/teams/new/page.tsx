@@ -36,17 +36,18 @@ export default function NewTeamPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-lg">
-      <Button variant="ghost" size="sm" asChild className="-ml-2 mb-6">
+    <div className="dispatch-workspace dispatch-workspace--narrow">
+      <Button variant="ghost" size="sm" asChild className="mb-6">
         <Link href="/dashboard/teams">
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Teams
         </Link>
       </Button>
 
-      <Card>
+      <Card className="dispatch-ledger-panel">
         <CardHeader>
           <CardTitle>Create a new team</CardTitle>
+          <p className="dispatch-page-code">WORKSPACE INTAKE / NEW TEAM</p>
           <CardDescription>
             Teams let you collaborate on shared links with colleagues.
           </CardDescription>
@@ -64,7 +65,7 @@ export default function NewTeamPage() {
             />
           </div>
           <Button
-            className="w-full"
+            className="dispatch-commit-action w-full"
             onClick={handleCreate}
             disabled={isPending || !name.trim()}
           >

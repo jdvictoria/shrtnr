@@ -3,9 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   AlertCircle,
+  ArrowRight,
   Check,
   ChevronDown,
   ChevronUp,
@@ -13,185 +13,213 @@ import {
   Eye,
   EyeOff,
   Loader2,
+  Navigation,
   X,
 } from "lucide-react";
 import { GeoRulesInput } from "@/components/geo-rules-input";
 import { useShortenForm, type SlugStatus } from "@/hooks/use-shorten-form";
+import { toDateTimeLocalValue } from "@/lib/datetime";
 
 const SLUG_INDICATOR: Record<SlugStatus, React.ReactNode> = {
   checking: <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />,
-  available: <Check className="h-4 w-4 text-green-500" />,
+  available: <Check className="h-4 w-4 text-success" />,
   taken:     <X className="h-4 w-4 text-destructive" />,
   invalid:   <AlertCircle className="h-4 w-4 text-destructive" />,
   idle:      null,
 };
 
 const SLUG_HINT: Record<SlugStatus, { text: string; cls: string } | null> = {
-  available: { text: "Available!",                            cls: "text-green-600 dark:text-green-400" },
+  available: { text: "Available!",                            cls: "text-success" },
   taken:     { text: "Already taken",                         cls: "text-destructive" },
   invalid:   { text: "Letters, numbers, - or _ (2–50 chars)", cls: "text-destructive" },
   checking:  null,
   idle:      null,
 };
 
-export function ShortenForm() {
-  const { state, dispatch, isPending, urlInputRef, appDomain, shortUrl, handleSubmit, handleCopy } =
-    useShortenForm();
+export function ShortenForm({ appUrl }: { appUrl: string }) {
+  const { state, dispatch, isPending, appDomain, shortUrl, handleSubmit, handleCopy } =
+    useShortenForm(appUrl);
 
   const { url, customSlug, expiresAt, password, showPassword, geoRules, slugStatus, result, copied, showAdvanced } =
     state;
 
   return (
-    <Card className="w-full max-w-2xl">
-      <CardContent className="pt-6 space-y-4">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* URL input */}
-          <div className="flex gap-2">
-            <div className="flex-1 relative">
-              <Label htmlFor="url" className="sr-only">URL</Label>
-              <Input
-                id="url"
-                type="url"
-                placeholder="https://example.com/very/long/url..."
-                ref={urlInputRef}
-                value={url}
-                onChange={(e) => dispatch({ type: "PATCH", payload: { url: e.target.value } })}
-                required
-                disabled={isPending}
-                className="pr-16 h-10"
-              />
-              <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none hidden sm:inline-flex items-center gap-0.5 rounded-lg border border-border bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
-                ⌘K
-              </kbd>
-            </div>
-            <Button
-              type="submit"
-              disabled={isPending || slugStatus === "taken" || slugStatus === "invalid"}
-              className="shrink-0 h-10 px-5"
-            >
-              {isPending ? <Loader2 className="animate-spin" /> : "Shorten"}
-            </Button>
-          </div>
+    <form onSubmit={handleSubmit} className="dispatch-form">
+      <section className="destination-band" aria-labelledby="destination-label">
+        <div className="destination-band__label-line">
+          <Label id="destination-label" htmlFor="url">Destination URL</Label>
+          <span className="destination-band__route" aria-hidden="true" />
+          <Navigation className="destination-band__plane" aria-hidden="true" />
+        </div>
 
-          {/* Advanced toggle */}
+        <div className="destination-band__controls">
+          <div className="destination-band__input-wrap">
+            <Input
+              id="url"
+              type="url"
+              placeholder="https://example.com/a/very/long/path"
+              value={url}
+              onChange={(e) => dispatch({ type: "PATCH", payload: { url: e.target.value } })}
+              required
+              disabled={isPending}
+              className="destination-band__input"
+            />
+          </div>
+          <Button
+            type="submit"
+            disabled={isPending || slugStatus === "taken" || slugStatus === "invalid"}
+            className="destination-band__submit"
+          >
+            {isPending ? (
+              <>
+                <Loader2 className="animate-spin" />
+                Shortening
+              </>
+            ) : (
+              <>
+                Shorten link
+                <ArrowRight aria-hidden="true" />
+              </>
+            )}
+          </Button>
+        </div>
+        <span className="destination-band__barcode destination-band__barcode--left" aria-hidden="true" />
+        <span className="destination-band__barcode destination-band__barcode--right" aria-hidden="true" />
+      </section>
+
+      <div className="dispatch-lower">
+        <section className="options-ticket">
           <button
             type="button"
             onClick={() => dispatch({ type: "PATCH", payload: { showAdvanced: !showAdvanced } })}
-            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+            className="options-ticket__toggle"
+            aria-expanded={showAdvanced}
+            aria-controls="link-options-panel"
           >
-            <span className="flex items-center justify-center h-4 w-4">
-              {showAdvanced ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-            </span>
-            Advanced options
+            <span>Link options</span>
+            {showAdvanced ? <ChevronUp aria-hidden="true" /> : <ChevronDown aria-hidden="true" />}
           </button>
 
-          {showAdvanced && (
-            <div className="space-y-5 pt-3 border-t border-border/60">
-              {/* Custom alias */}
-              <div className="space-y-1.5">
-                <Label htmlFor="slug">Custom alias</Label>
-                <div className="flex items-center rounded-xl border border-input focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1 focus-within:border-primary/50 overflow-hidden bg-background transition-all duration-200">
-                  <span className="px-3 h-9 flex items-center text-sm text-muted-foreground bg-muted border-r border-input whitespace-nowrap shrink-0">
-                    {appDomain}/
-                  </span>
-                  <input
-                    id="slug"
-                    className="flex-1 px-3 h-9 text-sm bg-transparent outline-none placeholder:text-muted-foreground"
-                    placeholder="my-link"
-                    value={customSlug}
-                    onChange={(e) => dispatch({ type: "PATCH", payload: { customSlug: e.target.value } })}
-                    disabled={isPending}
-                    readOnly
-                    onFocus={(e) => e.target.removeAttribute("readonly")}
-                    spellCheck={false}
-                  />
-                  {SLUG_INDICATOR[slugStatus] && (
-                    <span className="pr-3">{SLUG_INDICATOR[slugStatus]}</span>
+          <div id="link-options-panel" className="options-ticket__body" data-open={showAdvanced}>
+            {!showAdvanced ? (
+              <div className="options-ticket__summary" aria-hidden="true">
+                {[
+                  "Custom alias",
+                  "Password",
+                  "Expiration",
+                  "Geographic redirects",
+                ].map((label) => (
+                  <div className="option-summary-row" key={label}>
+                    <span>{label}</span>
+                    <span className="option-summary-row__mark" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="options-ticket__fields">
+                <div className="option-field">
+                  <Label htmlFor="slug">Custom alias</Label>
+                  <div className="alias-control">
+                    <span>{appDomain}/</span>
+                    <input
+                      id="slug"
+                      placeholder="my-link"
+                      value={customSlug}
+                      onChange={(e) => dispatch({ type: "PATCH", payload: { customSlug: e.target.value } })}
+                      disabled={isPending}
+                      readOnly
+                      onFocus={(e) => e.target.removeAttribute("readonly")}
+                      spellCheck={false}
+                    />
+                    {SLUG_INDICATOR[slugStatus] && (
+                      <span className="alias-control__status">{SLUG_INDICATOR[slugStatus]}</span>
+                    )}
+                  </div>
+                  {SLUG_HINT[slugStatus] && (
+                    <p className={`option-field__hint ${SLUG_HINT[slugStatus]!.cls}`} role="status">
+                      {SLUG_HINT[slugStatus]!.text}
+                    </p>
                   )}
                 </div>
-                {SLUG_HINT[slugStatus] && (
-                  <p className={`text-xs ${SLUG_HINT[slugStatus]!.cls}`}>{SLUG_HINT[slugStatus]!.text}</p>
-                )}
-              </div>
 
-              {/* Password protection */}
-              <div className="space-y-1.5">
-                <Label htmlFor="password">
-                  Password protection{" "}
-                  <span className="text-muted-foreground font-normal">(optional)</span>
-                </Label>
-                <div className="relative">
+                <div className="option-field">
+                  <Label htmlFor="password">
+                    Password <span>(optional)</span>
+                  </Label>
+                  <div className="password-control">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Leave blank for public access"
+                      value={password}
+                      onChange={(e) => dispatch({ type: "PATCH", payload: { password: e.target.value } })}
+                      disabled={isPending}
+                      readOnly
+                      onFocus={(e) => e.target.removeAttribute("readonly")}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => dispatch({ type: "PATCH", payload: { showPassword: !showPassword } })}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      aria-pressed={showPassword}
+                    >
+                      {showPassword ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="option-field">
+                  <Label htmlFor="expires">
+                    Expiration <span>(optional)</span>
+                  </Label>
                   <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Leave blank for public access"
-                    value={password}
-                    onChange={(e) => dispatch({ type: "PATCH", payload: { password: e.target.value } })}
+                    id="expires"
+                    type="datetime-local"
+                    value={expiresAt}
+                    onChange={(e) => dispatch({ type: "PATCH", payload: { expiresAt: e.target.value } })}
+                    min={toDateTimeLocalValue(new Date(Date.now() + 60_000))}
                     disabled={isPending}
-                    className="pr-10"
-                    readOnly
-                    onFocus={(e) => e.target.removeAttribute("readonly")}
                   />
-                  <button
-                    type="button"
-                    onClick={() => dispatch({ type: "PATCH", payload: { showPassword: !showPassword } })}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
+                </div>
+
+                <div className="option-field option-field--geo">
+                  <GeoRulesInput
+                    rules={geoRules}
+                    onChange={(rules) => dispatch({ type: "PATCH", payload: { geoRules: rules } })}
+                  />
                 </div>
               </div>
+            )}
+          </div>
+        </section>
 
-              {/* Expiration */}
-              <div className="space-y-1.5">
-                <Label htmlFor="expires">
-                  Expiration date{" "}
-                  <span className="text-muted-foreground font-normal">(optional)</span>
-                </Label>
-                <Input
-                  id="expires"
-                  type="datetime-local"
-                  value={expiresAt}
-                  onChange={(e) => dispatch({ type: "PATCH", payload: { expiresAt: e.target.value } })}
-                  min={new Date(Date.now() + 60_000).toISOString().slice(0, 16)}
-                  disabled={isPending}
-                />
-              </div>
+        <div className="dispatch-perforation" aria-hidden="true">
+          {Array.from({ length: 9 }).map((_, index) => <span key={index} />)}
+        </div>
 
-              {/* Geo rules */}
-              <GeoRulesInput
-                rules={geoRules}
-                onChange={(rules) => dispatch({ type: "PATCH", payload: { geoRules: rules } })}
-              />
+        <section
+          className="result-ticket"
+          data-state={result ? "ready" : "empty"}
+          aria-live="polite"
+        >
+          <span className="result-ticket__line result-ticket__line--one" aria-hidden="true" />
+          <span className="result-ticket__line result-ticket__line--two" aria-hidden="true" />
+          {result && (
+            <div data-testid="shorten-result" className="result-ticket__content">
+              <span className="result-ticket__url">{shortUrl}</span>
+              <Button
+                type="button"
+                onClick={handleCopy}
+                className="result-ticket__copy"
+                aria-label={copied ? "Short link copied" : "Copy short link"}
+              >
+                {copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
+                {copied ? "Copied" : "Copy"}
+              </Button>
             </div>
           )}
-        </form>
-
-        {/* Result */}
-        {result && (
-          <div
-            data-testid="shorten-result"
-            className="flex items-center gap-3 p-3 rounded-xl border border-green-500/25 bg-green-500/5"
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-green-500 shrink-0" />
-            <span className="flex-1 text-sm font-mono font-medium truncate text-foreground">
-              {shortUrl}
-            </span>
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={handleCopy}
-              className="shrink-0 h-8 w-8 rounded-lg hover:bg-green-500/10"
-            >
-              {copied ? (
-                <Check className="h-4 w-4 text-green-500" />
-              ) : (
-                <Copy className="h-4 w-4 text-muted-foreground" />
-              )}
-            </Button>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        </section>
+      </div>
+    </form>
   );
 }
