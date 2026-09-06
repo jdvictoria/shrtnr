@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import { redis, LINK_TTL, type CachedLink } from "@/lib/redis";
+import { cacheLink, isCachedLink, redis, type CachedLink } from "@/lib/redis";
 import { parseUA } from "@/lib/ua-parser";
+import { verifyLinkAccessGrant } from "@/lib/link-access-grant";
 
 export async function GET(
   request: Request,
@@ -11,7 +12,9 @@ export async function GET(
   const { slug } = await params;
 
   // ── 1. Redis cache (serves 99% of requests without a DB query) ────────────
-  let cached = await redis.get<CachedLink>(`link:${slug}`);
+  const cachedValue = await redis.get<unknown>(`link:${slug}`);
+  let cached: CachedLink | null = isCachedLink(cachedValue) ? cachedValue : null;
+  if (cachedValue && !cached) await redis.del(`link:${slug}`);
 
   if (!cached) {
     // ── 2. Cache miss — fetch full link data ─────────────────────────────────
@@ -31,15 +34,15 @@ export async function GET(
       return NextResponse.redirect(new URL("/not-found", request.url));
     }
 
+    await cacheLink(slug, link);
     cached = {
       id: link.id,
       url: link.url,
       expiresAt: link.expiresAt?.toISOString() ?? null,
-      hasPassword: !!link.passwordHash,
+      hasPassword: Boolean(link.passwordHash),
       isActive: link.isActive,
       geoRules: link.geoRules,
     };
-    await redis.set(`link:${slug}`, cached, { ex: LINK_TTL });
   }
 
   // ── 3. Active check ───────────────────────────────────────────────────────
@@ -56,7 +59,8 @@ export async function GET(
   // ── 5. Password gate ──────────────────────────────────────────────────────
   if (cached.hasPassword) {
     const cookieStore = await cookies();
-    if (!cookieStore.get(`pw_${slug}`)) {
+    const grant = cookieStore.get(`pw_${slug}`)?.value;
+    if (!verifyLinkAccessGrant(slug, grant)) {
       return NextResponse.redirect(new URL(`/pw/${slug}`, request.url));
     }
   }

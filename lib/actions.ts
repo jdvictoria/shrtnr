@@ -6,9 +6,12 @@ import { nanoid } from "nanoid";
 import bcrypt from "bcryptjs";
 import { auth } from "@/auth";
 import { prisma } from "./prisma";
-import { redis, LINK_TTL, type CachedLink } from "./redis";
+import { cacheLink, redis } from "./redis";
 import { rateLimit } from "./rate-limit";
 import { LINKS_PAGE_SIZE } from "./utils";
+import { parseExpiry } from "./datetime";
+import { hasTeamRole, linkAccessWhere } from "./link-access";
+import { createLinkAccessGrant } from "./link-access-grant";
 
 export type ActionResult<T> =
   | { success: true; data: T }
@@ -58,10 +61,9 @@ export async function shortenUrl(
     slug = nanoid(7);
   }
 
-  const expiry = expiresAt ? new Date(expiresAt) : null;
-  if (expiry && expiry <= new Date()) {
-    return { success: false, error: "Expiration date must be in the future" };
-  }
+  const parsedExpiry = parseExpiry(expiresAt);
+  if (!parsedExpiry.success) return parsedExpiry;
+  const expiry = parsedExpiry.value;
 
   const session = await auth();
   const userId = session?.user?.id ?? null;
@@ -82,16 +84,11 @@ export async function shortenUrl(
       },
     });
 
-    // Cache full link data so redirects never need a DB round-trip
-    const cached: CachedLink = {
-      id: link.id,
-      url: link.url,
-      expiresAt: link.expiresAt?.toISOString() ?? null,
-      hasPassword: !!passwordHash,
-      isActive: true,
+    await cacheLink(slug, {
+      ...link,
+      passwordHash,
       geoRules: validGeoRules,
-    };
-    await redis.set(`link:${slug}`, cached, { ex: LINK_TTL });
+    });
 
     revalidatePath("/");
     revalidatePath("/dashboard");
@@ -112,6 +109,7 @@ export async function createLink(
   notes?: string,
   password?: string,
   geoRules?: GeoRule[],
+  teamId?: string,
 ): Promise<ActionResult<{ id: string; slug: string }>> {
   const session = await auth();
   if (!session?.user?.id) return { success: false, error: "Not signed in" };
@@ -130,9 +128,16 @@ export async function createLink(
     slug = nanoid(7);
   }
 
-  const expiry = expiresAt ? new Date(expiresAt) : null;
-  if (expiry && expiry <= new Date())
-    return { success: false, error: "Expiration date must be in the future" };
+  const parsedExpiry = parseExpiry(expiresAt);
+  if (!parsedExpiry.success) return parsedExpiry;
+  const expiry = parsedExpiry.value;
+
+  if (teamId && !(await hasTeamRole(session.user.id, teamId))) {
+    return { success: false, error: "You cannot create links in this team" };
+  }
+  if (teamId && folderId) {
+    return { success: false, error: "Team folders are not available yet" };
+  }
 
   const passwordHash = password?.trim() ? await bcrypt.hash(password.trim(), 12) : null;
   const validGeoRules = (geoRules ?? []).filter((r) => r.country && r.url);
@@ -144,6 +149,7 @@ export async function createLink(
         url: url.trim(),
         expiresAt: expiry,
         userId: session.user.id,
+        teamId: teamId || null,
         folderId: folderId || null,
         notes: notes?.trim() || null,
         passwordHash,
@@ -151,16 +157,13 @@ export async function createLink(
       },
     });
 
-    const cached: CachedLink = {
-      id: link.id,
-      url: link.url,
-      expiresAt: link.expiresAt?.toISOString() ?? null,
-      hasPassword: !!passwordHash,
-      isActive: true,
+    await cacheLink(slug, {
+      ...link,
+      passwordHash,
       geoRules: validGeoRules,
-    };
-    await redis.set(`link:${slug}`, cached, { ex: LINK_TTL });
+    });
     revalidatePath("/dashboard");
+    if (teamId) revalidatePath(`/dashboard/teams/${teamId}`);
 
     return { success: true, data: { id: link.id, slug: link.slug } };
   } catch {
@@ -185,11 +188,15 @@ export async function getLinks(options?: {
   const pageSize = options?.pageSize ?? LINKS_PAGE_SIZE;
   const isArchived = options?.archived ?? false;
 
-  const where = {
+  const where = options?.teamId ? {
+    teamId: options.teamId,
+    ...linkAccessWhere(session.user.id),
+    isArchived,
+  } : {
     userId: session.user.id,
+    teamId: null,
     isArchived,
     ...(options?.folderId ? { folderId: options.folderId } : {}),
-    ...(options?.teamId ? { teamId: options.teamId } : {}),
     ...(options?.tagId ? { tags: { some: { tag: { id: options.tagId } } } } : {}),
   };
 
@@ -215,9 +222,9 @@ export async function getStats() {
   if (!session?.user?.id) return { totalLinks: 0, totalClicks: 0 };
 
   const [totalLinks, aggregate] = await Promise.all([
-    prisma.link.count({ where: { userId: session.user.id } }),
+    prisma.link.count({ where: { userId: session.user.id, teamId: null } }),
     prisma.link.aggregate({
-      where: { userId: session.user.id },
+      where: { userId: session.user.id, teamId: null },
       _sum: { clicks: true },
     }),
   ]);
@@ -232,7 +239,7 @@ export async function getLinkAnalytics(id: string, days = 30) {
   if (!session?.user?.id) return null;
 
   const link = await prisma.link.findFirst({
-    where: { id, userId: session.user.id },
+    where: { id, ...linkAccessWhere(session.user.id) },
   });
   if (!link) return null;
 
@@ -295,12 +302,16 @@ export async function deleteLink(id: string): Promise<ActionResult<void>> {
   if (!session?.user?.id) return { success: false, error: "Not authenticated" };
 
   try {
-    const link = await prisma.link.delete({
-      where: { id, userId: session.user.id },
+    const link = await prisma.link.findFirst({
+      where: { id, ...linkAccessWhere(session.user.id, "write") },
+      select: { id: true, slug: true, teamId: true },
     });
+    if (!link) return { success: false, error: "Link not found" };
+    await prisma.link.delete({ where: { id: link.id } });
     await redis.del(`link:${link.slug}`);
     revalidatePath("/");
     revalidatePath("/dashboard");
+    if (link.teamId) revalidatePath(`/dashboard/teams/${link.teamId}`);
     return { success: true, data: undefined };
   } catch {
     return { success: false, error: "Failed to delete link" };
@@ -316,28 +327,55 @@ export async function editLink(
     tagIds?: string[];
     expiresAt?: string | null;
   }
-): Promise<ActionResult<void>> {
+): Promise<ActionResult<{ expiresAt: Date | null }>> {
   const session = await auth();
   if (!session?.user?.id) return { success: false, error: "Not authenticated" };
 
   // ownership check
-  const link = await prisma.link.findFirst({ where: { id, userId: session.user.id } });
+  const link = await prisma.link.findFirst({
+    where: { id, ...linkAccessWhere(session.user.id, "write") },
+  });
   if (!link) return { success: false, error: "Link not found" };
 
   if (data.url) {
     try { new URL(data.url); } catch { return { success: false, error: "Invalid URL" }; }
   }
 
+  let expiry: Date | null | undefined;
+  if (data.expiresAt !== undefined) {
+    const parsedExpiry = parseExpiry(data.expiresAt);
+    if (!parsedExpiry.success) return parsedExpiry;
+    expiry = parsedExpiry.value;
+  }
+
+  const resourceScope = link.teamId
+    ? { teamId: link.teamId }
+    : { userId: session.user.id, teamId: null };
+  if (data.folderId) {
+    const folder = await prisma.folder.findFirst({
+      where: { id: data.folderId, ...resourceScope },
+      select: { id: true },
+    });
+    if (!folder) return { success: false, error: "Folder is not available for this link" };
+  }
+  if (data.tagIds) {
+    const uniqueTagIds = [...new Set(data.tagIds)];
+    const allowedTags = await prisma.tag.count({
+      where: { id: { in: uniqueTagIds }, ...resourceScope },
+    });
+    if (allowedTags !== uniqueTagIds.length) {
+      return { success: false, error: "One or more tags are not available for this link" };
+    }
+  }
+
   try {
-    await prisma.link.update({
+    const updated = await prisma.link.update({
       where: { id },
       data: {
         ...(data.url && { url: data.url.trim() }),
         notes: data.notes ?? undefined,
         folderId: data.folderId !== undefined ? data.folderId : undefined,
-        expiresAt: data.expiresAt !== undefined
-          ? (data.expiresAt ? new Date(data.expiresAt) : null)
-          : undefined,
+        expiresAt: expiry,
         ...(data.tagIds !== undefined && {
           tags: {
             deleteMany: {},
@@ -346,12 +384,10 @@ export async function editLink(
         }),
       },
     });
-    // Invalidate Redis cache if URL changed
-    if (data.url) {
-      await redis.del(`link:${link.slug}`);
-    }
+    await redis.del(`link:${link.slug}`);
     revalidatePath("/dashboard");
-    return { success: true, data: undefined };
+    if (link.teamId) revalidatePath(`/dashboard/teams/${link.teamId}`);
+    return { success: true, data: { expiresAt: updated.expiresAt } };
   } catch {
     return { success: false, error: "Failed to update link" };
   }
@@ -361,12 +397,16 @@ export async function toggleActive(id: string): Promise<ActionResult<{ isActive:
   const session = await auth();
   if (!session?.user?.id) return { success: false, error: "Not authenticated" };
 
-  const link = await prisma.link.findFirst({ where: { id, userId: session.user.id }, select: { isActive: true, slug: true } });
+  const link = await prisma.link.findFirst({
+    where: { id, ...linkAccessWhere(session.user.id, "write") },
+    select: { isActive: true, slug: true, teamId: true },
+  });
   if (!link) return { success: false, error: "Link not found" };
 
   const updated = await prisma.link.update({ where: { id }, data: { isActive: !link.isActive } });
   await redis.del(`link:${link.slug}`);
   revalidatePath("/dashboard");
+  if (link.teamId) revalidatePath(`/dashboard/teams/${link.teamId}`);
   return { success: true, data: { isActive: updated.isActive } };
 }
 
@@ -374,11 +414,15 @@ export async function toggleArchive(id: string): Promise<ActionResult<{ isArchiv
   const session = await auth();
   if (!session?.user?.id) return { success: false, error: "Not authenticated" };
 
-  const link = await prisma.link.findFirst({ where: { id, userId: session.user.id }, select: { isArchived: true } });
+  const link = await prisma.link.findFirst({
+    where: { id, ...linkAccessWhere(session.user.id, "write") },
+    select: { isArchived: true, teamId: true },
+  });
   if (!link) return { success: false, error: "Link not found" };
 
   const updated = await prisma.link.update({ where: { id }, data: { isArchived: !link.isArchived } });
   revalidatePath("/dashboard");
+  if (link.teamId) revalidatePath(`/dashboard/teams/${link.teamId}`);
   return { success: true, data: { isArchived: updated.isArchived } };
 }
 
@@ -388,8 +432,8 @@ export async function togglePin(id: string): Promise<ActionResult<{ isPinned: bo
 
   try {
     const link = await prisma.link.findFirst({
-      where: { id, userId: session.user.id },
-      select: { isPinned: true },
+      where: { id, ...linkAccessWhere(session.user.id, "write") },
+      select: { isPinned: true, teamId: true },
     });
     if (!link) return { success: false, error: "Link not found" };
 
@@ -398,6 +442,7 @@ export async function togglePin(id: string): Promise<ActionResult<{ isPinned: bo
       data: { isPinned: !link.isPinned },
     });
     revalidatePath("/dashboard");
+    if (link.teamId) revalidatePath(`/dashboard/teams/${link.teamId}`);
     return { success: true, data: { isPinned: updated.isPinned } };
   } catch {
     return { success: false, error: "Failed to update link" };
@@ -427,11 +472,12 @@ export async function verifyLinkPassword(
   if (!valid) return { success: false, error: "Incorrect password" };
 
   const cookieStore = await cookies();
-  cookieStore.set(`pw_${slug}`, "1", {
+  const grant = createLinkAccessGrant(slug);
+  cookieStore.set(`pw_${slug}`, grant.value, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 60 * 60 * 24, // 24 hours
+    maxAge: grant.maxAge,
   });
 
   return { success: true, data: undefined };

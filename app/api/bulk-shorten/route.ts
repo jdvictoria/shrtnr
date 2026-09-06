@@ -16,6 +16,9 @@ const SLUG_REGEX = /^[a-zA-Z0-9_-]+$/;
  */
 export async function POST(request: Request) {
   const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "anon";
 
   const rl = await rateLimit(`bulk:${ip}`, { limit: 50, windowSec: 60 });
@@ -52,7 +55,7 @@ export async function POST(request: Request) {
   }
 
   const link = await prisma.link.create({
-    data: { slug, url: url.trim(), userId: session?.user?.id ?? null },
+    data: { slug, url: url.trim(), userId: session.user.id },
   });
 
   const cached: CachedLink = {
