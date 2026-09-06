@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
+import { Antonio, Outfit } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { Providers } from "@/components/providers";
@@ -8,6 +8,12 @@ const font = Outfit({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
   variable: "--font-sans",
+});
+
+const display = Antonio({
+  subsets: ["latin"],
+  weight: ["400", "600"],
+  variable: "--font-display",
 });
 
 export const metadata: Metadata = {
@@ -63,7 +69,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${font.className} h-svh flex flex-col`}>
+      <body className={`${font.className} ${display.variable} min-h-svh flex flex-col`}>
         <Providers>
           {children}
           <Toaster />

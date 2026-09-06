@@ -1,30 +1,23 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { headers } from "next/headers";
-import { ArrowLeft, Clock, ExternalLink, MousePointerClick } from "lucide-react";
+import { ArrowLeft, Clock, ExternalLink } from "lucide-react";
 import { getLinkAnalytics } from "@/lib/actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AnalyticsChart } from "@/components/analytics-chart";
-import { BreakdownPie } from "@/components/breakdown-pie";
-import { CountryMap } from "@/components/country-map";
-
-// Converts ISO country code to flag emoji
-function flag(code: string) {
-  return code
-    .toUpperCase()
-    .replace(/./g, (c) => String.fromCodePoint(c.charCodeAt(0) + 127397));
-}
+import {
+  LazyAnalyticsChart,
+  LazyBreakdownPie,
+  LazyCountryMap,
+} from "@/components/lazy-analytics";
 
 function BreakdownBar({
   items,
-  label,
   total,
 }: {
   items: { name: string; count: number }[];
-  label: string;
   total: number;
 }) {
   if (items.length === 0)
@@ -43,8 +36,8 @@ function BreakdownBar({
                 <span className="text-muted-foreground font-normal">({pct}%)</span>
               </span>
             </div>
-            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-              <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
+            <div className="h-1.5 overflow-hidden border border-border bg-muted">
+              <div className="h-full bg-primary" style={{ width: `${pct}%` }} />
             </div>
           </div>
         );
@@ -76,9 +69,9 @@ export default async function LinkAnalyticsPage({
   const isExpired = link.expiresAt && link.expiresAt < new Date();
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="dispatch-workspace dispatch-workspace--measure">
       {/* Back */}
-      <Button variant="ghost" size="sm" asChild className="-ml-2 mb-4">
+      <Button variant="ghost" size="sm" asChild className="mb-5">
         <Link href="/dashboard">
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Dashboard
@@ -86,13 +79,14 @@ export default async function LinkAnalyticsPage({
       </Button>
 
       {/* Header */}
-      <div className="flex items-start justify-between gap-4 mb-6">
+      <div className="dispatch-page-header flex items-start justify-between gap-4 mb-6">
         <div className="min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <h1 className="text-2xl font-bold">/{link.slug}</h1>
+            <h1>/{link.slug}</h1>
             {link.passwordHash && <Badge variant="outline">Password protected</Badge>}
             {isExpired && <Badge variant="destructive">Expired</Badge>}
           </div>
+          <p className="dispatch-page-code">LINK ANALYTICS / {days} DAY VIEW</p>
           <a href={link.url} target="_blank" rel="noopener noreferrer"
             className="text-sm text-muted-foreground hover:underline flex items-center gap-1 truncate max-w-lg">
             {link.url}
@@ -116,27 +110,19 @@ export default async function LinkAnalyticsPage({
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <MousePointerClick className="h-4 w-4" />All-time clicks
-            </CardTitle>
-          </CardHeader>
-          <CardContent><div className="text-3xl font-bold">{link.clicks}</div></CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <MousePointerClick className="h-4 w-4" />Last {days} days
-            </CardTitle>
-          </CardHeader>
-          <CardContent><div className="text-3xl font-bold">{totalInPeriod}</div></CardContent>
-        </Card>
-      </div>
+      <dl className="dispatch-ledger-summary mb-6">
+        <div>
+          <dt>All-time clicks</dt>
+          <dd>{link.clicks}</dd>
+        </div>
+        <div>
+          <dt>Last {days} days</dt>
+          <dd>{totalInPeriod}</dd>
+        </div>
+      </dl>
 
       {/* Chart */}
-      <Card className="mb-6">
+      <Card className="dispatch-ledger-panel mb-6">
         <CardHeader>
           <div className="flex items-center justify-between flex-wrap gap-2">
             <CardTitle>Clicks over time</CardTitle>
@@ -154,7 +140,7 @@ export default async function LinkAnalyticsPage({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <AnalyticsChart data={clicksByDay} />
+          <LazyAnalyticsChart data={clicksByDay} />
         </CardContent>
       </Card>
 
@@ -168,22 +154,22 @@ export default async function LinkAnalyticsPage({
           <TabsTrigger value="referer">Referer</TabsTrigger>
         </TabsList>
 
-        <Card>
+        <Card className="dispatch-ledger-panel">
           <CardContent className="pt-6">
             <TabsContent value="country">
-              <CountryMap data={topCountries} />
+              <LazyCountryMap data={topCountries} />
             </TabsContent>
             <TabsContent value="device">
-              <BreakdownPie items={deviceStats} />
+              <LazyBreakdownPie items={deviceStats} />
             </TabsContent>
             <TabsContent value="browser">
-              <BreakdownPie items={browserStats} />
+              <LazyBreakdownPie items={browserStats} />
             </TabsContent>
             <TabsContent value="os">
-              <BreakdownPie items={osStats} />
+              <LazyBreakdownPie items={osStats} />
             </TabsContent>
             <TabsContent value="referer">
-              <BreakdownBar items={topReferers} total={totalInPeriod} label="referer" />
+              <BreakdownBar items={topReferers} total={totalInPeriod} />
             </TabsContent>
           </CardContent>
         </Card>

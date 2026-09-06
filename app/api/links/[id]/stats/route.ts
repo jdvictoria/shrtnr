@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { linkAccessWhere } from "@/lib/link-access";
 
 /**
  * GET /api/links/:id/stats?days=30
@@ -10,11 +12,18 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
   const { id } = await params;
   const { searchParams } = new URL(request.url);
   const days = Math.min(90, Math.max(1, Number(searchParams.get("days") ?? 30)));
 
-  const link = await prisma.link.findUnique({ where: { id } });
+  const link = await prisma.link.findFirst({
+    where: { id, ...linkAccessWhere(session.user.id) },
+    select: { id: true, slug: true, url: true, clicks: true, expiresAt: true, teamId: true, createdAt: true },
+  });
   if (!link) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);

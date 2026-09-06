@@ -1,5 +1,5 @@
 declare module "react-simple-maps" {
-  import { ComponentPropsWithoutRef, ReactNode } from "react";
+  import { ReactNode } from "react";
 
   export interface ProjectionConfig {
     scale?: number;

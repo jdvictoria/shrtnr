@@ -2,18 +2,18 @@ import { Coffee, Github } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border/60 mt-auto py-5">
-      <div className="container mx-auto px-4 max-w-6xl flex items-center justify-between">
-        <p className="text-xs text-muted-foreground">
+    <footer className="dispatch-footer">
+      <div className="dispatch-footer__inner">
+        <p>
           © 2026 jdvictoria. All rights reserved.
         </p>
-        <div className="flex items-center gap-3">
+        <div className="dispatch-footer__links">
           <a
             href="https://ko-fi.com/B0B71W3AVW"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Support on Ko-fi"
-            className="text-[#f5b073] hover:text-[#f5b073]/70 transition-colors"
+            className="dispatch-footer__link dispatch-footer__link--support"
           >
             <Coffee className="h-4 w-4" />
           </a>
@@ -22,7 +22,7 @@ export function Footer() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="GitHub"
-            className="text-muted-foreground hover:text-primary transition-colors"
+            className="dispatch-footer__link"
           >
             <Github className="h-4 w-4" />
           </a>

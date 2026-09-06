@@ -3,9 +3,9 @@
 import { useReducer, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createLink } from "@/lib/actions";
-import { getAppUrl } from "@/lib/utils";
 import { toast } from "sonner";
 import type { GeoRule } from "@/components/geo-rules-input";
+import { localDateTimeToIso } from "@/lib/datetime";
 
 export type SlugStatus = "idle" | "checking" | "available" | "taken" | "invalid";
 
@@ -50,12 +50,12 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-export function useAddLinkDialog() {
+export function useAddLinkDialog(teamId?: string, appUrl?: string) {
   const router = useRouter();
   const [state, dispatch] = useReducer(reducer, initial);
   const [isPending, startTransition] = useTransition();
 
-  const appDomain = getAppUrl().replace(/^https?:\/\//, "");
+  const appDomain = appUrl?.replace(/^https?:\/\//, "") ?? "shrten.app";
 
   // Debounced slug availability check
   useEffect(() => {
@@ -84,15 +84,23 @@ export function useAddLinkDialog() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!state.url.trim() || state.slugStatus === "taken" || state.slugStatus === "invalid") return;
+    const expiry = state.expiresAt
+      ? (localDateTimeToIso(state.expiresAt) ?? undefined)
+      : undefined;
+    if (state.expiresAt && !expiry) {
+      toast.error("Enter a valid expiration date");
+      return;
+    }
     startTransition(async () => {
       const res = await createLink(
         state.url.trim(),
         state.customSlug.trim() || undefined,
-        state.expiresAt || undefined,
+        expiry,
         state.folderId || undefined,
         state.notes.trim() || undefined,
         state.password.trim() || undefined,
         state.geoRules.filter((r) => r.country && r.url),
+        teamId,
       );
       if (!res.success) { toast.error(res.error); return; }
       toast.success("Link created!");

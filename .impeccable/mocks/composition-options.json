@@ -1,0 +1,41 @@
+{
+  "title": "Choose the homepage composition",
+  "question": "The Dispatch Label world is fixed. Which layout should become the measured build contract?",
+  "options": [
+    {
+      "id": "comp-a",
+      "label": "Single dispatch sheet",
+      "kicker": "ORIGINAL COMP",
+      "lineage": "one continuous airway bill",
+      "thesis": "Headline, destination, link options, and future result read as one coherent dispatch document.",
+      "palette": ["#F7F3E8", "#141414", "#F05A28", "#1E5AA8"],
+      "materials": ["thermal stock", "routing bars", "perforation"],
+      "viewport": "A large headline anchors the upper left while the destination line and expanded options span the working sheet beneath it.",
+      "risk": "The broad composition needs disciplined responsive reflow to avoid becoming a poster on small screens.",
+      "comp": ".impeccable/mocks/dispatch-label-a.webp"
+    },
+    {
+      "id": "comp-b",
+      "label": "Manifest split",
+      "lineage": "editorial cover beside a working manifest",
+      "thesis": "The promise stays fixed on the left while the complete shortening task occupies the larger working pane.",
+      "palette": ["#F7F3E8", "#141414", "#F05A28", "#1E5AA8"],
+      "materials": ["thermal stock", "routing rules", "registration marks"],
+      "viewport": "A 42/58 split gives the form the larger right column and keeps all current advanced controls visible in one compact manifest.",
+      "risk": "The permanent split is excellent on desktop but must stack carefully on narrow screens.",
+      "comp": ".impeccable/mocks/dispatch-label-b.png"
+    },
+    {
+      "id": "comp-c",
+      "label": "Perforated handoff",
+      "lineage": "address band above a detachable receipt",
+      "thesis": "The long destination crosses one decisive action line, with configuration and future output separated below the perforation.",
+      "palette": ["#F7F3E8", "#141414", "#F05A28", "#1E5AA8"],
+      "materials": ["thermal stock", "perforation", "blank result slip"],
+      "viewport": "A full-width URL band dominates; link options sit lower left and a blank result handoff zone waits lower right.",
+      "risk": "The empty result zone is visually strong but may consume too much space before submission.",
+      "comp": ".impeccable/mocks/dispatch-label-c.png"
+    }
+  ],
+  "steer": true
+}

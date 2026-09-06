@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Archive, FolderOpen, Link2, Tag } from "lucide-react";
+import { Archive, Link2 } from "lucide-react";
 
 type FolderItem = { id: string; name: string; color: string };
 type TagItem = { id: string; name: string; color: string };
@@ -15,7 +15,7 @@ interface MobileFilterBarProps {
 }
 
 function pill(active: boolean) {
-  return `inline-flex items-center gap-1.5 shrink-0 rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
+  return `inline-flex min-h-11 items-center gap-1.5 shrink-0 rounded-none px-3 py-2 font-mono text-xs font-medium border transition-colors ${
     active
       ? "bg-primary text-primary-foreground border-primary"
       : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"

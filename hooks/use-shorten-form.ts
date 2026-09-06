@@ -1,10 +1,10 @@
 "use client";
 
-import { useReducer, useEffect, useRef, useTransition } from "react";
+import { useReducer, useEffect, useTransition } from "react";
 import { shortenUrl } from "@/lib/actions";
-import { getAppUrl } from "@/lib/utils";
 import { toast } from "sonner";
 import type { GeoRule } from "@/components/geo-rules-input";
+import { localDateTimeToIso } from "@/lib/datetime";
 
 export type SlugStatus = "idle" | "checking" | "available" | "taken" | "invalid";
 
@@ -47,26 +47,12 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-export function useShortenForm() {
+export function useShortenForm(appUrl: string) {
   const [state, dispatch] = useReducer(reducer, initial);
   const [isPending, startTransition] = useTransition();
-  const urlInputRef = useRef<HTMLInputElement>(null);
 
-  const appUrl = getAppUrl();
   const appDomain = appUrl.replace(/^https?:\/\//, "");
   const shortUrl = state.result ? `${appUrl}/${state.result.slug}` : "";
-
-  // ⌘K / Ctrl+K — focus URL input
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        urlInputRef.current?.focus();
-      }
-    }
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, []);
 
   // Debounced slug availability check
   useEffect(() => {
@@ -95,11 +81,18 @@ export function useShortenForm() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!state.url.trim() || state.slugStatus === "taken" || state.slugStatus === "invalid") return;
+    const expiry = state.expiresAt
+      ? (localDateTimeToIso(state.expiresAt) ?? undefined)
+      : undefined;
+    if (state.expiresAt && !expiry) {
+      toast.error("Enter a valid expiration date");
+      return;
+    }
     startTransition(async () => {
       const res = await shortenUrl(
         state.url.trim(),
         state.customSlug.trim() || undefined,
-        state.expiresAt || undefined,
+        expiry,
         state.password.trim() || undefined,
         state.geoRules.filter((r) => r.country && r.url),
       );
@@ -116,5 +109,5 @@ export function useShortenForm() {
     setTimeout(() => dispatch({ type: "PATCH", payload: { copied: false } }), 2000);
   }
 
-  return { state, dispatch, isPending, urlInputRef, appDomain, shortUrl, handleSubmit, handleCopy };
+  return { state, dispatch, isPending, appDomain, shortUrl, handleSubmit, handleCopy };
 }

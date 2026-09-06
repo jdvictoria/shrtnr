@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-06T17:45:54Z",
+  "title": "Design System: shrten Dispatch Label and Ledger",
+  "extensions": {
+    "colorMeta": {
+      "dispatch-paper": {
+        "role": "neutral",
+        "displayName": "Thermal Paper",
+        "canonical": "#f7f5e7",
+        "tonalRamp": ["#181711", "#302e24", "#4d4a3d", "#716d5d", "#999483", "#c2bdab", "#e4e0d1", "#f7f5e7"]
+      },
+      "dispatch-ink": {
+        "role": "neutral",
+        "displayName": "Carbon Ink",
+        "canonical": "#0b0a08",
+        "tonalRamp": ["#0b0a08", "#292822", "#47453d", "#67645a", "#89857a", "#aaa69b", "#d0ccc0", "#f4f0df"]
+      },
+      "dispatch-orange": {
+        "role": "primary",
+        "displayName": "Safety Orange",
+        "canonical": "#f45d08",
+        "tonalRamp": ["#4a1600", "#7a2600", "#a93800", "#d94a00", "#f45d08", "#ff8240", "#ffb17f", "#ffe2cc"]
+      },
+      "dispatch-cobalt": {
+        "role": "secondary",
+        "displayName": "Registration Cobalt",
+        "canonical": "#2b56c6",
+        "tonalRamp": ["#0c1c4a", "#16317a", "#2146aa", "#2b56c6", "#4d73db", "#7597ff", "#a9bdff", "#dde5ff"]
+      },
+      "dispatch-muted": {
+        "role": "neutral",
+        "displayName": "Faded Receipt Ink",
+        "canonical": "#6f6b60",
+        "tonalRamp": ["#1b1a17", "#34322d", "#504d45", "#6f6b60", "#8c877b", "#aba69a", "#cec9bc", "#eeeade"]
+      },
+      "dispatch-rule": {
+        "role": "neutral",
+        "displayName": "Dispatch Rule",
+        "canonical": "rgba(11, 10, 8, 0.72)",
+        "tonalRamp": ["rgba(11, 10, 8, 0.9)", "rgba(11, 10, 8, 0.8)", "rgba(11, 10, 8, 0.72)", "rgba(11, 10, 8, 0.62)", "rgba(11, 10, 8, 0.5)", "rgba(11, 10, 8, 0.38)", "rgba(11, 10, 8, 0.24)", "rgba(11, 10, 8, 0.12)"]
+      },
+      "ledger-rule": {
+        "role": "neutral",
+        "displayName": "Ledger Rule",
+        "canonical": "rgba(11, 10, 8, 0.58)",
+        "tonalRamp": ["rgba(11, 10, 8, 0.86)", "rgba(11, 10, 8, 0.76)", "rgba(11, 10, 8, 0.66)", "rgba(11, 10, 8, 0.58)", "rgba(11, 10, 8, 0.46)", "rgba(11, 10, 8, 0.34)", "rgba(11, 10, 8, 0.22)", "rgba(11, 10, 8, 0.1)"]
+      },
+      "night-paper": {
+        "role": "neutral",
+        "displayName": "Night Stock",
+        "canonical": "#11100d",
+        "tonalRamp": ["#11100d", "#292720", "#47443a", "#686459", "#8d887b", "#b2ad9f", "#d7d2c4", "#f7f5e7"]
+      },
+      "night-ink": {
+        "role": "neutral",
+        "displayName": "Night Carbon Ink",
+        "canonical": "#f4f0df",
+        "tonalRamp": ["#0b0a08", "#292822", "#47453d", "#67645a", "#89857a", "#aaa69b", "#d0ccc0", "#f4f0df"]
+      },
+      "night-orange": {
+        "role": "primary",
+        "displayName": "Night Safety Orange",
+        "canonical": "#ff6a10",
+        "tonalRamp": ["#4a1600", "#7a2600", "#aa3900", "#dd4d00", "#ff6a10", "#ff8a48", "#ffb486", "#ffe3d0"]
+      },
+      "night-cobalt": {
+        "role": "secondary",
+        "displayName": "Night Registration Cobalt",
+        "canonical": "#7597ff",
+        "tonalRamp": ["#0c1c4a", "#16317a", "#2146aa", "#2b56c6", "#4d73db", "#7597ff", "#a9bdff", "#dde5ff"]
+      },
+      "night-muted": {
+        "role": "neutral",
+        "displayName": "Night Faded Ink",
+        "canonical": "#a8a296",
+        "tonalRamp": ["#1b1a17", "#34322d", "#504d45", "#6f6b60", "#8c877b", "#a8a296", "#cec9bc", "#eeeade"]
+      },
+      "night-dispatch-rule": {
+        "role": "neutral",
+        "displayName": "Night Dispatch Rule",
+        "canonical": "rgba(244, 240, 223, 0.68)",
+        "tonalRamp": ["rgba(244, 240, 223, 0.12)", "rgba(244, 240, 223, 0.22)", "rgba(244, 240, 223, 0.34)", "rgba(244, 240, 223, 0.46)", "rgba(244, 240, 223, 0.56)", "rgba(244, 240, 223, 0.68)", "rgba(244, 240, 223, 0.8)", "rgba(244, 240, 223, 0.9)"]
+      },
+      "night-ledger-rule": {
+        "role": "neutral",
+        "displayName": "Night Ledger Rule",
+        "canonical": "rgba(244, 240, 223, 0.52)",
+        "tonalRamp": ["rgba(244, 240, 223, 0.1)", "rgba(244, 240, 223, 0.18)", "rgba(244, 240, 223, 0.28)", "rgba(244, 240, 223, 0.38)", "rgba(244, 240, 223, 0.52)", "rgba(244, 240, 223, 0.64)", "rgba(244, 240, 223, 0.76)", "rgba(244, 240, 223, 0.88)"]
+      },
+      "success": {
+        "role": "success",
+        "displayName": "Verified Green",
+        "canonical": "#176b3a",
+        "tonalRamp": ["#0b2d1a", "#104528", "#176b3a", "#23894e", "#45aa6d", "#76c993", "#afe3c2", "#e4f6ea"]
+      },
+      "night-success": {
+        "role": "success",
+        "displayName": "Night Verified Green",
+        "canonical": "#7bdca6",
+        "tonalRamp": ["#0b2d1a", "#104528", "#176b3a", "#23894e", "#45aa6d", "#7bdca6", "#afe3c2", "#e4f6ea"]
+      },
+      "folder-default": {
+        "role": "data",
+        "displayName": "Folder Cyan",
+        "canonical": "#06b6d4",
+        "tonalRamp": ["#083344", "#155e75", "#0e7490", "#0891b2", "#06b6d4", "#22d3ee", "#67e8f9", "#cffafe"]
+      },
+      "copy-white": {
+        "role": "neutral",
+        "displayName": "Copy White",
+        "canonical": "#ffffff",
+        "tonalRamp": ["#171717", "#333333", "#555555", "#777777", "#999999", "#bbbbbb", "#dddddd", "#ffffff"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Public Dispatch Display", "purpose": "Oversized homepage promise in the condensed Antonio face." },
+      "auth-display": { "displayName": "Access Display", "purpose": "Large, narrow account proposition on the context side of an access document." },
+      "status-title": { "displayName": "Route Status Title", "purpose": "Oversized expired or missing-route headline inside a terminal document." },
+      "page-title": { "displayName": "Ledger Page Title", "purpose": "Dashboard, analytics, team, and workspace document headers." },
+      "ticket-title": { "displayName": "Ticket Title", "purpose": "Access, protected-link, route-status, dialog, and ledger-panel headings." },
+      "metric": { "displayName": "Ledger Metric", "purpose": "Cobalt values in ruled semantic summaries and stat strips." },
+      "action": { "displayName": "Public Dispatch Action", "purpose": "The joined, high-commitment homepage shorten control." },
+      "body": { "displayName": "Product Body", "purpose": "Tables, explanations, descriptions, and secondary content in Outfit." },
+      "label": { "displayName": "Operational Label", "purpose": "Public fields, disclosures, URLs, and result state." },
+      "code": { "displayName": "Document Code", "purpose": "Uppercase route, access, page, and summary labels." },
+      "index-label": { "displayName": "Dispatch Index Label", "purpose": "Sidebar group labels and the persistent ledger marker." },
+      "micro": { "displayName": "Receipt Microcopy", "purpose": "Keycaps, table headings, badges, footer metadata, compact tags, and copy actions." }
+    },
+    "shadows": [
+      { "name": "dialog-lift", "value": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)", "purpose": "Optional separation for temporary modal documents above the ledger." },
+      { "name": "sheet-lift", "value": "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)", "purpose": "Separates the mobile dispatch-index sheet from the dimmed workspace." }
+    ],
+    "motion": [
+      { "name": "handoff-arrive", "value": "360ms cubic-bezier(0.2, 0.8, 0.2, 1)", "purpose": "Moves a successful short link into the result ticket from the dispatch direction." },
+      { "name": "directional-nudge", "value": "180ms ease", "purpose": "Moves public arrows slightly toward their destination on hover." },
+      { "name": "footer-lift", "value": "150ms ease", "purpose": "Acknowledges hover on compact footer links." },
+      { "name": "index-collapse", "value": "200ms linear", "purpose": "Changes the desktop dispatch index between its 16rem and 3rem widths." },
+      { "name": "dialog-state", "value": "200ms", "purpose": "Fades, zooms, and translates temporary modal documents." },
+      { "name": "sheet-travel", "value": "300ms ease-in-out", "purpose": "Moves the mobile dispatch index horizontally on and off canvas." },
+      { "name": "reduced-motion", "value": "none", "purpose": "Removes public arrival and directional transitions when reduced motion is requested." }
+    ],
+    "breakpoints": [
+      { "name": "public-compact", "value": "540px" },
+      { "name": "ledger-stack", "value": "640px" },
+      { "name": "index-sheet", "value": "768px" },
+      { "name": "surface-stack", "value": "900px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Dispatch Navigation",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "Ruled public header whose orange account entry is demoted when auth or route recovery owns the page commitment.",
+      "html": "<nav class=\"ds-nav\"><div class=\"ds-nav__group\"><a class=\"ds-nav__brand\" href=\"#\"><span class=\"ds-nav__register\" aria-hidden=\"true\"></span>shrten</a><button class=\"ds-nav__theme\" aria-label=\"Toggle theme\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41\"></path></svg></button></div><a class=\"ds-nav__entry\" href=\"#\">Get started <svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M5 12h14M13 6l6 6-6 6\"></path></svg></a></nav>",
+      "css": ".ds-nav{height:76px;display:flex;align-items:stretch;justify-content:space-between;border-bottom:1px solid #0b0a08;background:#f7f5e7;color:#0b0a08;font-family:Outfit,sans-serif}.ds-nav__group{display:flex;align-items:center;padding-left:clamp(18px,3vw,50px)}.ds-nav__brand{display:flex;align-items:center;gap:18px;color:inherit;text-decoration:none;font-size:2.25rem;font-weight:600;letter-spacing:-.045em}.ds-nav__register{width:14px;height:14px;border:1px solid #2b56c6;border-radius:50%}.ds-nav__theme{width:48px;height:48px;margin-left:75px;border:0;border-radius:0;background:#0b0a08;color:#f7f5e7}.ds-nav svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2}.ds-nav__entry{display:flex;align-items:center;gap:28px;padding:0 clamp(22px,3vw,50px);border-left:1px solid #0b0a08;background:#f45d08;color:#0b0a08;font:700 1rem ui-monospace,monospace;text-decoration:none}.ds-nav--context .ds-nav__entry{background:#0b0a08;color:#f7f5e7}.ds-nav a:focus-visible,.ds-nav button:focus-visible{outline:3px solid #2b56c6;outline-offset:-4px}"
+    },
+    {
+      "name": "Destination Field",
+      "kind": "input",
+      "refersTo": "destination-input",
+      "description": "Oversized square address field with a cobalt route line, visible keyboard focus, and optional shortcut keycap.",
+      "html": "<label class=\"ds-destination\">Destination URL<span class=\"ds-destination__route\" aria-hidden=\"true\"></span><span class=\"ds-destination__wrap\"><input type=\"url\" placeholder=\"https://example.com/a/very/long/path\"><kbd>⌘K</kbd></span></label>",
+      "css": ".ds-destination{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:16px;color:#0b0a08;font:700 .95rem ui-monospace,monospace;letter-spacing:.02em}.ds-destination__route{height:1px;background:#2b56c6}.ds-destination__wrap{position:relative;grid-column:1/-1}.ds-destination input{width:100%;height:98px;padding:0 92px 0 38px;border:2px solid #0b0a08;border-radius:0;background:rgba(255,255,255,.16);color:#0b0a08;font:400 1.25rem ui-monospace,monospace}.ds-destination input:focus-visible{border-color:#2b56c6;outline:3px solid rgba(43,86,198,.34);outline-offset:3px}.ds-destination kbd{position:absolute;right:20px;top:50%;padding:6px 8px;transform:translateY(-50%);border:1px solid #0b0a08;color:#6f6b60;font:400 .65rem ui-monospace,monospace}"
+    },
+    {
+      "name": "Shorten Action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The public safety-orange commitment action, joined directly to the destination field.",
+      "html": "<button class=\"ds-shorten\">Shorten link <svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M5 12h14M13 6l6 6-6 6\"></path></svg></button>",
+      "css": ".ds-shorten{height:98px;display:inline-flex;align-items:center;justify-content:center;gap:24px;padding:0 28px;border:2px solid #0b0a08;border-radius:0;background:#f45d08;color:#0b0a08;font:600 1.55rem Antonio,sans-serif;letter-spacing:-.02em}.ds-shorten svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;transition:transform 180ms ease}.ds-shorten:hover:not(:disabled) svg{transform:translateX(5px)}.ds-shorten:focus-visible{outline:3px solid #2b56c6;outline-offset:-4px}.ds-shorten:disabled{cursor:not-allowed;opacity:.55}@media(prefers-reduced-motion:reduce){.ds-shorten svg{transition:none}}"
+    },
+    {
+      "name": "Options Ticket",
+      "kind": "card",
+      "refersTo": "ticket-options",
+      "description": "Ruled disclosure ticket that previews advanced routing controls before expanding into live fields.",
+      "html": "<section class=\"ds-options\"><button aria-expanded=\"false\">Link options <span aria-hidden=\"true\">⌄</span></button><ul><li>Custom alias <i></i></li><li>Password <i></i></li><li>Expiration <i></i></li><li>Geographic redirects <i></i></li></ul></section>",
+      "css": ".ds-options{border:1px solid #0b0a08;background:#f7f5e7;color:#0b0a08;font-family:ui-monospace,monospace}.ds-options button{width:100%;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border:0;border-bottom:1px solid #0b0a08;border-radius:0;background:transparent;color:inherit;font:700 .95rem ui-monospace,monospace}.ds-options button span{color:#2b56c6}.ds-options button:focus-visible{outline:3px solid #2b56c6;outline-offset:-4px}.ds-options ul{margin:0;padding:8px 20px 15px;list-style:none}.ds-options li{height:46px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px dashed rgba(11,10,8,.3);color:#6f6b60;font-size:.9rem}.ds-options li:last-child{border-bottom:0}.ds-options i{width:9px;height:9px;border:1px solid #2b56c6}"
+    },
+    {
+      "name": "Result Handoff",
+      "kind": "custom",
+      "refersTo": "ticket-result",
+      "description": "Detachable public result tray with writing rules, a full-value short URL, and cobalt copy acknowledgement.",
+      "html": "<section class=\"ds-result\" aria-live=\"polite\"><span class=\"ds-result__rule ds-result__rule--one\" aria-hidden=\"true\"></span><span class=\"ds-result__rule ds-result__rule--two\" aria-hidden=\"true\"></span><div class=\"ds-result__content\"><strong>shrten.example/x7Qp</strong><button aria-label=\"Copy short link\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><rect x=\"9\" y=\"9\" width=\"10\" height=\"10\" rx=\"1\"></rect><path d=\"M15 9V5H5v10h4\"></path></svg>Copy</button></div></section>",
+      "css": ".ds-result{position:relative;min-height:230px;border:1px solid #0b0a08;background:#f7f5e7;color:#0b0a08}.ds-result__rule{position:absolute;left:7%;right:7%;height:1px;background:#2b56c6;opacity:.44}.ds-result__rule--one{top:38%}.ds-result__rule--two{top:62%}.ds-result__content{position:relative;z-index:1;min-height:230px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:20px;padding:42px;animation:ds-arrive 360ms cubic-bezier(.2,.8,.2,1) both}.ds-result strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:700 1.25rem ui-monospace,monospace}.ds-result button{height:52px;display:inline-flex;align-items:center;gap:10px;padding:0 16px;border:1px solid #0b0a08;border-radius:0;background:#2b56c6;color:#fff;font:800 .72rem ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase}.ds-result button svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2}.ds-result button:focus-visible{outline:3px solid #2b56c6;outline-offset:3px}@keyframes ds-arrive{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}@media(prefers-reduced-motion:reduce){.ds-result__content{animation:none}}"
+    },
+    {
+      "name": "Access Ticket",
+      "kind": "card",
+      "refersTo": "ticket-access",
+      "description": "Ruled credential document paired with account context and one orange local-submit action.",
+      "html": "<section class=\"ds-access\"><header><h2>Welcome back</h2><p>ACCESS / RETURNING OPERATOR</p><span>Sign in to open your link ledger.</span></header><div class=\"ds-access__body\"><label>Email<input type=\"email\"></label><label>Password<input type=\"password\"></label><button>Sign in</button></div></section>",
+      "css": ".ds-access{width:min(100%,560px);border:1px solid #0b0a08;background:#f7f5e7;color:#0b0a08}.ds-access header{padding:24px;border-bottom:1px solid #0b0a08}.ds-access h2{margin:0;font:500 2.2rem/1 Antonio,sans-serif;letter-spacing:-.02em}.ds-access header p{margin:12px 0 6px;color:#2b56c6;font:800 .68rem/1 ui-monospace,monospace;letter-spacing:.09em;text-transform:uppercase}.ds-access header span{color:#6f6b60;font:400 .9rem/1.5 Outfit,sans-serif}.ds-access__body{display:grid;gap:16px;padding:24px}.ds-access label{display:grid;gap:6px;font:800 .72rem ui-monospace,monospace;letter-spacing:.05em;text-transform:uppercase}.ds-access input{height:52px;border:1px solid #0b0a08;border-radius:0;background:transparent;padding:0 12px}.ds-access input:focus-visible,.ds-access button:focus-visible{outline:3px solid #2b56c6;outline-offset:2px}.ds-access button{height:50px;border:1px solid #0b0a08;border-radius:0;background:#f45d08;color:#0b0a08;font:800 .78rem ui-monospace,monospace;letter-spacing:.04em;text-transform:uppercase}"
+    },
+    {
+      "name": "Dispatch Index",
+      "kind": "nav",
+      "refersTo": "sidebar-index",
+      "description": "Persistent 16rem ruled management index with a cobalt selected row and 3rem collapsed rail.",
+      "html": "<nav class=\"ds-index\"><header><span class=\"ds-index__register\">＋</span><div><strong>shrten</strong><small>Dispatch ledger</small></div></header><p>Links</p><a class=\"ds-index__active\" href=\"#\">All Links <i></i></a><a href=\"#\">Archived</a><hr><p>Organization</p><a href=\"#\">Teams</a><hr><p>Folders</p><a href=\"#\">Campaigns <b>12</b></a></nav>",
+      "css": ".ds-index{width:16rem;min-height:420px;padding:8px;border-right:1px solid #0b0a08;background:#f1eedc;color:#0b0a08;font:400 .875rem Outfit,sans-serif}.ds-index header{height:48px;display:flex;align-items:center;gap:10px}.ds-index__register{width:32px;height:32px;display:grid;place-items:center;border:1px solid #2b56c6;border-radius:50%;color:#2b56c6}.ds-index header div{display:flex;flex-direction:column}.ds-index header strong{font-size:1rem}.ds-index header small,.ds-index p{font:700 .64rem/1 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:#6f6b60}.ds-index p{margin:18px 8px 8px}.ds-index a{position:relative;display:flex;align-items:center;min-height:34px;padding:8px;border:1px solid transparent;color:inherit;text-decoration:none}.ds-index a:hover,.ds-index__active{border-color:#0b0a08!important;background:#2b56c6;color:#fff!important}.ds-index a i{position:absolute;right:7px;width:5px;height:5px;border:1px solid currentColor}.ds-index a b{margin-left:auto;font-weight:400;opacity:.5}.ds-index hr{height:1px;margin:8px;border:0;background:#67645a}.ds-index a:focus-visible{outline:3px solid #2b56c6;outline-offset:2px}"
+    },
+    {
+      "name": "Ledger Summary",
+      "kind": "custom",
+      "refersTo": "ledger-summary",
+      "description": "Semantic two- or three-cell ruled summary with monospace definitions and cobalt Antonio values.",
+      "html": "<dl class=\"ds-summary\"><div><dt>Total links</dt><dd>42</dd></div><div><dt>Total clicks</dt><dd>918</dd></div><div><dt>Average clicks per link</dt><dd>21.9</dd></div></dl>",
+      "css": ".ds-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;border:1px solid #0b0a08;background:#f7f5e7;color:#0b0a08}.ds-summary>div{min-height:78px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:18px;padding:14px 18px;border-right:1px dashed rgba(11,10,8,.58)}.ds-summary>div:last-child{border-right:0}.ds-summary dt{font:800 .68rem ui-monospace,monospace;letter-spacing:.05em;text-transform:uppercase}.ds-summary dd{margin:0;color:#2b56c6;font:500 2.35rem/1 Antonio,sans-serif}@media(max-width:640px){.ds-summary{grid-template-columns:1fr}.ds-summary>div{min-height:62px;border-right:0;border-bottom:1px dashed rgba(11,10,8,.58)}.ds-summary>div:last-child{border-bottom:0}}"
+    },
+    {
+      "name": "Ledger Panel",
+      "kind": "card",
+      "refersTo": "ledger-panel",
+      "description": "Square translucent work document with ruled header, dense rows, compact filters, and preserved mobile records.",
+      "html": "<section class=\"ds-ledger\"><header><div><h2>Your Links</h2><p>42 links · page 1 of 3</p></div><input aria-label=\"Search links\" placeholder=\"Search by slug, URL or notes...\"></header><table><thead><tr><th>Short URL</th><th>Original URL</th><th>Clicks</th><th>Actions</th></tr></thead><tbody><tr><td><a href=\"#\">/dispatch</a></td><td>https://example.com/long-path</td><td>24</td><td><button aria-label=\"More actions\">•••</button></td></tr></tbody></table></section>",
+      "css": ".ds-ledger{border:1px solid #0b0a08;background:#f7f5e7;color:#0b0a08;font-family:Outfit,sans-serif}.ds-ledger header{display:flex;align-items:end;justify-content:space-between;gap:18px;padding:24px;border-bottom:1px solid #0b0a08}.ds-ledger h2{margin:0;font:500 1.8rem/1 Antonio,sans-serif}.ds-ledger p{margin:6px 0 0;color:#6f6b60;font-size:.875rem}.ds-ledger input{width:min(280px,45%);height:32px;border:1px solid #0b0a08;border-radius:0;background:transparent;padding:0 10px;font:400 .8rem ui-monospace,monospace}.ds-ledger table{width:100%;border-collapse:collapse}.ds-ledger th{height:44px;padding:0 12px;border-bottom:1px solid #0b0a08;background:#efeddc;color:#6f6b60;text-align:left;font:700 .7rem ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase}.ds-ledger td{padding:12px;border-bottom:1px solid rgba(11,10,8,.35);font-size:.875rem}.ds-ledger td:nth-child(2){max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#6f6b60}.ds-ledger a{color:#2b56c6}.ds-ledger button{width:32px;height:32px;border:1px solid transparent;border-radius:0;background:transparent}.ds-ledger button:hover{border-color:#0b0a08;background:#eeeadd}.ds-ledger input:focus-visible,.ds-ledger button:focus-visible,.ds-ledger a:focus-visible{outline:3px solid #2b56c6;outline-offset:2px}"
+    },
+    {
+      "name": "Route Status Ticket",
+      "kind": "custom",
+      "refersTo": "ticket-status",
+      "description": "Centered expired or missing-link document with side perforations, an explicit status code, and one recovery action.",
+      "html": "<section class=\"ds-status\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 7v5l3 2\"></path></svg><h1>Link expired</h1><p class=\"ds-status__code\">ROUTE STATUS / 410</p><p>This short link has passed its expiration date and is no longer active.</p><a href=\"#\">Create a new link</a></section>",
+      "css": ".ds-status{position:relative;width:min(100%,650px);padding:clamp(32px,6vw,72px);border:1px solid #0b0a08;background:#f7f5e7;color:#0b0a08}.ds-status:before,.ds-status:after{position:absolute;top:-1px;bottom:-1px;width:13px;background-image:radial-gradient(circle at center,#f7f5e7 5px,transparent 5.5px);background-size:13px 26px;content:''}.ds-status:before{left:-7px}.ds-status:after{right:-7px}.ds-status>svg{width:42px;height:42px;margin-bottom:18px;fill:none;stroke:#2b56c6;stroke-width:1.5}.ds-status h1{margin:0;font:400 clamp(3.5rem,8vw,6rem)/.94 Antonio,sans-serif;letter-spacing:-.04em}.ds-status__code{margin:12px 0 0!important;color:#2b56c6!important;font:800 .68rem/1 ui-monospace,monospace!important;letter-spacing:.09em;text-transform:uppercase}.ds-status>p:not(.ds-status__code){max-width:48ch;margin:20px 0 32px;color:#6f6b60;font:400 1rem/1.5 Outfit,sans-serif}.ds-status>a{min-height:50px;display:inline-flex;align-items:center;padding:0 16px;border:1px solid #0b0a08;background:#f45d08;color:#0b0a08;font:800 .78rem ui-monospace,monospace;letter-spacing:.04em;text-decoration:none;text-transform:uppercase}.ds-status>a:focus-visible{outline:3px solid #2b56c6;outline-offset:2px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Dispatch Ledger",
+    "overview": "shrten treats a URL as a dispatched item with a traceable operational life. The public Dispatch Label remains the first expression: a long destination enters through one broad intake field and leaves as a compact link ready to hand off. The Dispatch Ledger extends that same physical language through access, management, analytics, collaboration, and route resolution without asking users to learn a second interface.\n\nWarm thermal stock and carbon rules make the system tactile without making it ornamental. Safety orange marks the one action that commits the current workflow, while cobalt behaves like registration ink for routes, selected state, keyboard focus, metrics, and completed handoffs. Antonio carries promises, titles, and high-signal figures; Outfit carries readable product content; monospace labels expose operational structure.\n\nThe system is flat, square, and task-dense. Public perforation belongs to a real intake-to-handoff seam, auth becomes a ruled access ticket, signed-in work uses a persistent dispatch index plus dense ledger, analytics preserves the same compact reading order, and terminal routes become status documents. The metaphor clarifies the work and never changes the product's behavior.",
+    "keyCharacteristics": [
+      "Warm, lightly mottled thermal paper in light mode and near-black stock in dark mode.",
+      "Carbon-black structure, cobalt registration cues, and one safety-orange commitment action per surface.",
+      "Antonio display and metric roles, Outfit body copy, and monospace operational labels.",
+      "Square controls, ruled headers, semantic summaries, dense ledger rows, and flat document overlays.",
+      "Restrained perforation only where access, routing, or handoff creates a real seam.",
+      "One operating language from anonymous shortening through account work and recipient status."
+    ],
+    "rules": [
+      { "name": "The One Orange Action Rule", "body": "Safety orange marks the highest-commitment action in the current surface; when an auth or route-status action becomes orange, the public navbar entry is demoted to carbon ink so two orange commitments never compete.", "section": "colors" },
+      { "name": "The Blue Routing Rule", "body": "Cobalt marks direction, registration, selected state, keyboard focus, data, or a completed handoff; it does not compete with orange for commitment priority.", "section": "colors" },
+      { "name": "The Quantitative Gradient Exception", "body": "Decorative gradients are absent; a continuous cobalt scale is allowed only when it encodes quantitative analytics, such as the country-map legend.", "section": "colors" },
+      { "name": "The Three-Voice Rule", "body": "Antonio persuades and announces, monospace operates, and Outfit explains; never introduce a fourth typographic voice without a product-level reason.", "section": "typography" },
+      { "name": "The Ledger Density Rule", "body": "Dense does not mean tiny: use the compact monospace roles for labels and metadata, keep data values and actions legible, and let rules—not reduced type—create structure.", "section": "typography" },
+      { "name": "The Carbon Rule", "body": "Resting hierarchy comes from one-pixel ink rules, perforations, and tonal stock—not ambient drop shadows, blurred glows, or glass panels.", "section": "elevation" },
+      { "name": "The Overlay Exception Rule", "body": "Shadow may distinguish a temporary modal or mobile sheet from the document below; it must disappear when the overlay closes and must not migrate onto ordinary cards.", "section": "elevation" },
+      { "name": "The Square Control Rule", "body": "Inputs and action buttons meet their ledger geometry with zero radius; rounding them into pills or soft cards breaks the dispatch metaphor and weakens the operational hierarchy.", "section": "shapes" },
+      { "name": "The Real Handoff Rule", "body": "Use perforation only where the workflow crosses access, routing, issuance, or terminal resolution; ordinary grouping uses carbon rules.", "section": "shapes" },
+      { "name": "The Motion Has a Job Rule", "body": "Movement may show travel, access, progress, selection, or confirmation; if it does not explain one of those states, keep the printed surface still.", "section": "components" },
+      { "name": "The Behavior Lock Rule", "body": "Visual extensions may rearrange presentation responsively, but they must not change shortening rules, API contracts, persistence, permissions, account requirements, authentication behavior, or navigation destinations.", "section": "components" }
+    ],
+    "dos": [
+      "Do make each operating sequence read left-to-right or top-to-bottom: intake, optional routing, commitment, result, and next action.",
+      "Do use orange for one decisive commitment and cobalt for routing, selected state, focus, data, or completed handoff.",
+      "Do preserve the paper texture's source provenance and native 334px × 376px repeat when reusing the shipping plate.",
+      "Do start management surfaces with a ruled document header, semantic summaries where totals matter, and task-dense ledger content.",
+      "Do preserve every row field and action when a desktop table becomes a mobile record.",
+      "Do use access and status ticket perforation only at real handoffs; use ordinary carbon rules for ledger grouping.",
+      "Do verify extensions in light and dark themes, at desktop and narrow mobile widths, with keyboard focus and reduced motion."
+    ],
+    "donts": [
+      "Don't turn the public task, auth, status, or management work into centered rounded hero cards, floating glass panels, or a grid of generic dashboard cards.",
+      "Don't show two orange actions on one surface; demote the public navbar entry when auth or route recovery owns the commitment.",
+      "Don't use cobalt as a competing primary action or apply data gradients as decoration.",
+      "Don't add ambient shadows, oversized radii, decorative pills, or unrelated industrial marks to imitate the aesthetic.",
+      "Don't promote public perforations into ordinary dashboard regions; carry hierarchy, rules, type, and interaction behavior first.",
+      "Don't hide advanced options, copy feedback, theme choice, account navigation, filters, row actions, analytics ranges, or team permissions to simplify a narrow layout.",
+      "Don't claim that source-level completion proves authenticated rendered behavior; authenticated surfaces still require their own runtime acceptance evidence."
+    ]
+  }
+}

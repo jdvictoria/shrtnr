@@ -54,7 +54,7 @@ export function AnalyticsChart({ data }: AnalyticsChartProps) {
           contentStyle={{
             background: "hsl(var(--popover))",
             border: "1px solid hsl(var(--border))",
-            borderRadius: "8px",
+            borderRadius: 0,
             fontSize: 12,
           }}
           cursor={{ fill: "hsl(var(--muted))" }}
@@ -62,7 +62,7 @@ export function AnalyticsChart({ data }: AnalyticsChartProps) {
         <Bar
           dataKey="clicks"
           fill="hsl(var(--primary))"
-          radius={[4, 4, 0, 0]}
+          radius={[0, 0, 0, 0]}
           maxBarSize={40}
         />
       </BarChart>

@@ -50,7 +50,7 @@ const SheetContent = React.forwardRef<
     >
       <DialogPrimitive.Title className="sr-only">Navigation</DialogPrimitive.Title>
       {children}
-      <DialogPrimitive.Close className="absolute right-3 top-3 rounded-md p-1 text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
+      <DialogPrimitive.Close className="absolute right-3 top-3 rounded-none p-1 text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
         <X className="h-4 w-4" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>

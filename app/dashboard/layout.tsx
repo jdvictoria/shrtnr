@@ -7,36 +7,26 @@ import { DashboardSidebar } from "@/components/dashboard-sidebar";
 
 export default async function DashboardLayout({
   children,
-  searchParams,
 }: {
   children: React.ReactNode;
-  searchParams?: Promise<{ folderId?: string; archived?: string; tagId?: string }>;
 }) {
   const session = await auth();
   if (!session?.user) redirect("/sign-in");
 
-  const params = await searchParams;
-  const folderId = params?.folderId;
-  const tagId = params?.tagId;
-  const showArchived = params?.archived === "1";
-
   const [folders, tags] = await Promise.all([getFolders(), getTags()]);
 
   return (
-    <SidebarProvider className="h-svh">
+    <SidebarProvider className="dispatch-app h-svh">
       <DashboardSidebar
         folders={folders}
         tags={tags}
-        activeFolderId={folderId}
-        activeTagId={tagId}
-        showArchived={showArchived}
-        user={session.user}
       />
-      <SidebarInset className="overflow-y-auto">
+      <SidebarInset className="dispatch-app__main overflow-y-auto">
         {/* Mobile top bar */}
-        <header className="flex h-12 items-center gap-2 border-b border-border px-4 md:hidden shrink-0">
+        <header className="dispatch-mobile-bar flex h-14 items-center gap-3 border-b border-border px-4 md:hidden shrink-0">
           <SidebarTrigger />
-          <span className="font-semibold text-sm">shrten</span>
+          <span className="font-semibold">shrten</span>
+          <span className="ml-auto font-mono text-[0.62rem] uppercase tracking-[0.08em] text-muted-foreground">Dispatch ledger</span>
         </header>
         {children}
       </SidebarInset>

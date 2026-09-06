@@ -30,18 +30,19 @@ export function PasswordForm({ slug }: { slug: string }) {
   }
 
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader className="text-center">
-        <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+    <Card className="dispatch-password-ticket w-full max-w-md">
+      <CardHeader>
+        <div className="mb-3 flex h-12 w-12 items-center justify-center border border-primary text-primary">
           <Lock className="h-5 w-5" />
         </div>
         <CardTitle>Password required</CardTitle>
+        <p className="dispatch-auth-ticket__code">ROUTE / PROTECTED HANDOFF</p>
         <CardDescription>
           This link is protected. Enter the password to continue.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="dispatch-access-form space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="pw">Password</Label>
             <Input
@@ -55,7 +56,7 @@ export function PasswordForm({ slug }: { slug: string }) {
             />
             {error && <p className="text-xs text-destructive">{error}</p>}
           </div>
-          <Button type="submit" className="w-full" disabled={isPending}>
+          <Button type="submit" className="dispatch-commit-action w-full" disabled={isPending}>
             {isPending ? <Loader2 className="animate-spin" /> : "Continue"}
           </Button>
         </form>

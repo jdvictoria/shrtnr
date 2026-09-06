@@ -154,6 +154,8 @@ export function FolderNav({
       <button
         onClick={() => setMobileOpen((v) => !v)}
         className="lg:hidden w-full flex items-center justify-between px-2 py-2 mb-2 rounded-md text-sm font-medium hover:bg-accent transition-colors"
+        aria-expanded={mobileOpen}
+        aria-controls="folder-navigation"
       >
         <span className="flex items-center gap-2 text-muted-foreground">
           <FolderOpen className="h-3.5 w-3.5" />
@@ -162,7 +164,7 @@ export function FolderNav({
         {mobileOpen ? <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" /> : <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />}
       </button>
 
-      <div className={`space-y-6 ${mobileOpen ? "block" : "hidden lg:block"}`}>
+      <div id="folder-navigation" className={`space-y-6 ${mobileOpen ? "block" : "hidden lg:block"}`}>
       {/* All links */}
       <div className="space-y-1">
         <Link
@@ -189,6 +191,8 @@ export function FolderNav({
             onClick={() => setShowNewFolder((v) => !v)}
             className="text-muted-foreground hover:text-foreground transition-colors"
             title="New folder"
+            aria-label="New folder"
+            aria-expanded={showNewFolder}
           >
             <Plus className="h-3.5 w-3.5" />
           </button>
@@ -226,6 +230,7 @@ export function FolderNav({
                 disabled={deletingFolderId === folder.id || isPending}
                 className="opacity-0 group-hover:opacity-100 ml-1 text-muted-foreground hover:text-destructive transition-colors shrink-0"
                 title="Delete folder"
+                aria-label={`Delete folder ${folder.name}`}
               >
                 {deletingFolderId === folder.id ? (
                   <Loader2 className="h-3 w-3 animate-spin" />
@@ -293,6 +298,8 @@ export function FolderNav({
             onClick={() => setShowNewTag((v) => !v)}
             className="text-muted-foreground hover:text-foreground transition-colors"
             title="New tag"
+            aria-label="New tag"
+            aria-expanded={showNewTag}
           >
             <Plus className="h-3.5 w-3.5" />
           </button>
@@ -330,6 +337,7 @@ export function FolderNav({
                 disabled={deletingTagId === tag.id || isPending}
                 className="opacity-0 group-hover:opacity-100 ml-1 text-muted-foreground hover:text-destructive transition-colors shrink-0"
                 title="Delete tag"
+                aria-label={`Delete tag ${tag.name}`}
               >
                 {deletingTagId === tag.id ? (
                   <Loader2 className="h-3 w-3 animate-spin" />

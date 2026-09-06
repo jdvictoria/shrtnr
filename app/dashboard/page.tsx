@@ -1,6 +1,4 @@
-import { Link2, MousePointerClick, TrendingUp } from "lucide-react";
 import { auth } from "@/auth";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LinksTable } from "@/components/links-table";
 import { BulkUpload } from "@/components/bulk-upload";
 import { AddLinkDialog } from "@/components/add-link-dialog";
@@ -8,6 +6,7 @@ import { getLinks, getStats } from "@/lib/actions";
 import { LINKS_PAGE_SIZE } from "@/lib/utils";
 import { getFolders } from "@/lib/folder-actions";
 import { getTags } from "@/lib/tag-actions";
+import { headers } from "next/headers";
 
 export default async function Dashboard({
   searchParams,
@@ -33,55 +32,43 @@ export default async function Dashboard({
 
   const folderProps = folders.map(({ id, name, color }) => ({ id, name, color }));
   const tagProps = tags.map(({ id, name, color }) => ({ id, name, color }));
+  const requestHeaders = await headers();
+  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
+  const proto = requestHeaders.get("x-forwarded-proto")?.split(",")[0] ?? "http";
+  const appUrl = `${proto}://${host}`;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="dispatch-workspace">
       {/* Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="dispatch-page-header flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">
-            Welcome back, {session?.user?.name ?? session?.user?.email}
+          <h1>Link ledger</h1>
+          <p className="dispatch-page-code">LINK OPERATIONS / PERSONAL</p>
+          <p className="text-muted-foreground text-sm mt-2">
+            Signed in as {session?.user?.name ?? session?.user?.email}
           </p>
         </div>
         <div className="flex items-center gap-2 [&>*]:flex-1 sm:[&>*]:flex-none">
           <BulkUpload />
-          <AddLinkDialog folders={folderProps} />
+          <AddLinkDialog folders={folderProps} appUrl={appUrl} />
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Links</CardTitle>
-            <Link2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalLinks}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Clicks</CardTitle>
-            <MousePointerClick className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalClicks}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg. Clicks / Link</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{avgClicks}</div>
-          </CardContent>
-        </Card>
-      </div>
+      <dl className="dispatch-ledger-summary">
+        <div>
+          <dt>Total links</dt>
+          <dd>{stats.totalLinks}</dd>
+        </div>
+        <div>
+          <dt>Total clicks</dt>
+          <dd>{stats.totalClicks}</dd>
+        </div>
+        <div>
+          <dt>Average clicks per link</dt>
+          <dd>{avgClicks}</dd>
+        </div>
+      </dl>
 
       {/* Links table */}
       <LinksTable
@@ -93,6 +80,7 @@ export default async function Dashboard({
         page={page}
         totalPages={totalPages}
         total={total}
+        appUrl={appUrl}
       />
 
     </div>

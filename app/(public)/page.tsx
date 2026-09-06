@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ShortenForm } from "@/components/shorten-form";
+import { headers } from "next/headers";
 
 export const metadata: Metadata = {
   title: "shrten — Free URL Shortener",
@@ -8,25 +9,25 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-export default function Home() {
+export default async function Home() {
+  const requestHeaders = await headers();
+  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
+  const proto = requestHeaders.get("x-forwarded-proto")?.split(",")[0] ?? "http";
+  const appUrl = `${proto}://${host}`;
+
   return (
-    <div className="flex flex-col items-center w-full px-4 pt-10 pb-16">
-      {/* Hero */}
-      <div className="text-center mb-8 w-full max-w-lg mx-auto">
-        <h1 className="text-[44px] sm:text-[56px] font-extrabold tracking-[-0.03em] leading-[1.05] mb-3 text-foreground">
-          Shorten.
+    <section className="dispatch-page">
+      <div className="dispatch-hero">
+        <h1 className="dispatch-headline">
+          Pack a long URL
           <br />
-          <span className="font-extralight text-muted-foreground">
-            Share without the mess.
-          </span>
+          into a link that travels.
         </h1>
-
-        <p className="text-xs text-muted-foreground/50 tracking-wide">
-          Free forever · No account · Click analytics · Custom aliases
-        </p>
+        <p className="dispatch-note">No account required.</p>
+        <div className="dispatch-hero-seam" aria-hidden="true" />
+        <span className="dispatch-register dispatch-register--hero" aria-hidden="true" />
       </div>
-
-      <ShortenForm />
-    </div>
+      <ShortenForm appUrl={appUrl} />
+    </section>
   );
 }

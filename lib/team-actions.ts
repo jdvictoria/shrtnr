@@ -6,6 +6,12 @@ import { prisma } from "./prisma";
 import type { ActionResult } from "./actions";
 import { nanoid } from "nanoid";
 
+const TEAM_ROLES = ["admin", "editor", "viewer"] as const;
+
+function isTeamRole(value: string): value is (typeof TEAM_ROLES)[number] {
+  return TEAM_ROLES.includes(value as (typeof TEAM_ROLES)[number]);
+}
+
 export async function getMyTeams() {
   const session = await auth();
   if (!session?.user?.id) return [];
@@ -87,17 +93,39 @@ export async function inviteMember(
   const session = await auth();
   if (!session?.user?.id) return { success: false, error: "Not authenticated" };
 
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    return { success: false, error: "Enter a valid email address" };
+  }
+  if (!isTeamRole(role)) return { success: false, error: "Select a valid role" };
+
   // Must be admin
   const membership = await prisma.teamMember.findFirst({
     where: { teamId, userId: session.user.id, role: "admin" },
   });
   if (!membership) return { success: false, error: "Only admins can invite members" };
 
+  const existingMember = await prisma.teamMember.findFirst({
+    where: { teamId, user: { email: normalizedEmail } },
+    select: { id: true },
+  });
+  if (existingMember) {
+    return { success: false, error: "That person is already a team member" };
+  }
+
+  const existingInvitation = await prisma.teamInvitation.findFirst({
+    where: { teamId, email: normalizedEmail, expiresAt: { gt: new Date() } },
+    select: { id: true },
+  });
+  if (existingInvitation) {
+    return { success: false, error: "An active invitation already exists for that email" };
+  }
+
   try {
     const inv = await prisma.teamInvitation.create({
       data: {
         teamId,
-        email: email.trim().toLowerCase(),
+        email: normalizedEmail,
         role,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
       },
@@ -117,14 +145,23 @@ export async function acceptInvitation(
   const inv = await prisma.teamInvitation.findUnique({ where: { token } });
   if (!inv) return { success: false, error: "Invalid invitation" };
   if (inv.expiresAt < new Date()) return { success: false, error: "Invitation expired" };
+  if (!session.user.email || session.user.email.toLowerCase() !== inv.email.toLowerCase()) {
+    return { success: false, error: "This invitation belongs to another email address" };
+  }
 
   try {
-    await prisma.teamMember.upsert({
-      where: { teamId_userId: { teamId: inv.teamId, userId: session.user.id } },
-      update: { role: inv.role },
-      create: { teamId: inv.teamId, userId: session.user.id, role: inv.role },
+    await prisma.$transaction(async (tx) => {
+      const existingMembership = await tx.teamMember.findUnique({
+        where: { teamId_userId: { teamId: inv.teamId, userId: session.user.id } },
+        select: { id: true },
+      });
+      if (!existingMembership) {
+        await tx.teamMember.create({
+          data: { teamId: inv.teamId, userId: session.user.id, role: inv.role },
+        });
+      }
+      await tx.teamInvitation.delete({ where: { token } });
     });
-    await prisma.teamInvitation.delete({ where: { token } });
     revalidatePath("/dashboard/teams");
     return { success: true, data: { teamId: inv.teamId } };
   } catch {
@@ -139,13 +176,24 @@ export async function updateMemberRole(
 ): Promise<ActionResult<void>> {
   const session = await auth();
   if (!session?.user?.id) return { success: false, error: "Not authenticated" };
+  if (!isTeamRole(role)) return { success: false, error: "Select a valid role" };
 
   const myMembership = await prisma.teamMember.findFirst({
     where: { teamId, userId: session.user.id, role: "admin" },
   });
   if (!myMembership) return { success: false, error: "Only admins can change roles" };
 
-  await prisma.teamMember.update({ where: { id: memberId }, data: { role } });
+  const target = await prisma.teamMember.findFirst({ where: { id: memberId, teamId } });
+  if (!target) return { success: false, error: "Team member not found" };
+  if (target.userId === session.user.id) {
+    return { success: false, error: "You cannot change your own administrator role" };
+  }
+  if (target.role === "admin" && role !== "admin") {
+    const adminCount = await prisma.teamMember.count({ where: { teamId, role: "admin" } });
+    if (adminCount <= 1) return { success: false, error: "A team must keep at least one administrator" };
+  }
+
+  await prisma.teamMember.update({ where: { id: target.id }, data: { role } });
   revalidatePath(`/dashboard/teams/${teamId}`);
   return { success: true, data: undefined };
 }
@@ -162,7 +210,17 @@ export async function removeMember(
   });
   if (!myMembership) return { success: false, error: "Only admins can remove members" };
 
-  await prisma.teamMember.delete({ where: { id: memberId } });
+  const target = await prisma.teamMember.findFirst({ where: { id: memberId, teamId } });
+  if (!target) return { success: false, error: "Team member not found" };
+  if (target.userId === session.user.id) {
+    return { success: false, error: "You cannot remove yourself from this team" };
+  }
+  if (target.role === "admin") {
+    const adminCount = await prisma.teamMember.count({ where: { teamId, role: "admin" } });
+    if (adminCount <= 1) return { success: false, error: "A team must keep at least one administrator" };
+  }
+
+  await prisma.teamMember.delete({ where: { id: target.id } });
   revalidatePath(`/dashboard/teams/${teamId}`);
   return { success: true, data: undefined };
 }
@@ -185,6 +243,29 @@ export async function getTeamLinks(teamId: string) {
       user: { select: { name: true, email: true, image: true } },
     },
   });
+}
+
+export async function deleteTeam(teamId: string): Promise<ActionResult<void>> {
+  const session = await auth();
+  if (!session?.user?.id) return { success: false, error: "Not authenticated" };
+
+  const membership = await prisma.teamMember.findFirst({
+    where: { teamId, userId: session.user.id, role: "admin" },
+    select: { id: true },
+  });
+  if (!membership) return { success: false, error: "Only admins can delete a team" };
+
+  try {
+    await prisma.$transaction([
+      prisma.link.updateMany({ where: { teamId }, data: { teamId: null } }),
+      prisma.team.delete({ where: { id: teamId } }),
+    ]);
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/teams");
+    return { success: true, data: undefined };
+  } catch {
+    return { success: false, error: "Failed to delete team" };
+  }
 }
 
 export async function getMyRole(teamId: string): Promise<"admin" | "editor" | "viewer" | null> {

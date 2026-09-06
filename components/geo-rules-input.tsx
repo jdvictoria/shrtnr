@@ -82,9 +82,9 @@ export function GeoRulesInput({ rules, onChange }: GeoRulesInputProps) {
   const usedCountries = new Set(rules.map((r) => r.country));
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2" role="group" aria-labelledby="geo-rules-label">
       <div className="flex items-center justify-between">
-        <Label>Geographic redirects</Label>
+        <Label id="geo-rules-label">Geographic redirects</Label>
         <Button
           type="button"
           size="sm"
@@ -106,7 +106,8 @@ export function GeoRulesInput({ rules, onChange }: GeoRulesInputProps) {
           {rules.map((rule, i) => (
             <div key={i} className="flex gap-2 items-center">
               <select
-                className="flex h-9 rounded-md border border-input bg-background px-2 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                aria-label={`Country for redirect rule ${i + 1}`}
+                className="flex h-9 rounded-none border border-input bg-background px-2 py-1 font-mono text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 value={rule.country}
                 onChange={(e) => update(i, "country", e.target.value)}
               >
@@ -120,6 +121,7 @@ export function GeoRulesInput({ rules, onChange }: GeoRulesInputProps) {
                 ))}
               </select>
               <Input
+                aria-label={`Destination URL for redirect rule ${i + 1}`}
                 placeholder="https://example.com/localized"
                 value={rule.url}
                 onChange={(e) => update(i, "url", e.target.value)}
@@ -131,6 +133,7 @@ export function GeoRulesInput({ rules, onChange }: GeoRulesInputProps) {
                 variant="ghost"
                 className="h-9 w-9 shrink-0"
                 onClick={() => removeRule(i)}
+                aria-label={`Remove redirect rule ${i + 1}`}
               >
                 <X className="h-4 w-4" />
               </Button>

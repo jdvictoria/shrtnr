@@ -17,7 +17,7 @@ export default async function PasswordPage({
   if (!link?.passwordHash) notFound();
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4">
+    <div className="dispatch-status-page px-4">
       <PasswordForm slug={slug} />
     </div>
   );

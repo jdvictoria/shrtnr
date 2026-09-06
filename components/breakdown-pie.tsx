@@ -3,11 +3,11 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 const COLORS = [
-  "hsl(190 95% 45%)",  // primary cyan
-  "hsl(265 80% 58%)",  // accent purple
-  "hsl(190 95% 65%)",  // lighter cyan
-  "hsl(265 80% 40%)",  // darker purple
-  "hsl(215 30% 52%)",  // muted blue
+  "#2b56c6",
+  "#4d73db",
+  "#7597ff",
+  "#a9bdff",
+  "#6f6b60",
 ];
 
 interface BreakdownPieProps {
@@ -42,7 +42,7 @@ export function BreakdownPie({ items }: BreakdownPieProps) {
           contentStyle={{
             background: "hsl(var(--popover))",
             border: "1px solid hsl(var(--border))",
-            borderRadius: "8px",
+            borderRadius: 0,
             fontSize: 12,
           }}
         />

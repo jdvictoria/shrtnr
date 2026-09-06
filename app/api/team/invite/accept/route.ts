@@ -19,7 +19,12 @@ export async function GET(request: Request) {
 
   const result = await acceptInvitation(token);
   if (!result.success) {
-    redirect("/dashboard/teams?error=invite-failed");
+    const error = result.error.includes("another email")
+      ? "email-mismatch"
+      : result.error.includes("expired")
+        ? "invite-expired"
+        : "invite-failed";
+    redirect(`/dashboard/teams?error=${error}`);
   }
 
   redirect(`/dashboard/teams/${result.data.teamId}?joined=1`);

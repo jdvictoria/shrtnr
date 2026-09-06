@@ -3,6 +3,7 @@
 import { AuthError } from "next-auth";
 import { signIn, signOut } from "@/auth";
 import { prisma } from "./prisma";
+import { resolveAuthCallback } from "./auth-redirect";
 import bcrypt from "bcryptjs";
 
 export async function signInWithCredentials(
@@ -14,14 +15,14 @@ export async function signInWithCredentials(
     await signIn("credentials", {
       email,
       password,
-      redirectTo: callbackUrl ?? "/dashboard",
+      redirectTo: resolveAuthCallback(callbackUrl),
     });
     return {};
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
         case "CredentialsSignin":
-          return { error: "Invalid email or password" };
+          return { error: "That email and password do not match. Check both fields and try again." };
         default:
           return { error: "Authentication failed. Please try again." };
       }
@@ -30,8 +31,9 @@ export async function signInWithCredentials(
   }
 }
 
+/** @deprecated Retained temporarily for legacy GitHub-linked accounts. */
 export async function signInWithGitHub(callbackUrl?: string) {
-  await signIn("github", { redirectTo: callbackUrl ?? "/dashboard" });
+  await signIn("github", { redirectTo: resolveAuthCallback(callbackUrl) });
 }
 
 export async function signOutAction() {

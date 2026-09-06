@@ -31,31 +31,35 @@ import {
 } from "lucide-react";
 import { GeoRulesInput } from "@/components/geo-rules-input";
 import { useAddLinkDialog, type SlugStatus } from "@/hooks/use-add-link-dialog";
+import { toDateTimeLocalValue } from "@/lib/datetime";
 
 type Folder = { id: string; name: string; color: string };
 
 interface AddLinkDialogProps {
   folders: Folder[];
+  appUrl?: string;
+  teamId?: string;
+  triggerLabel?: string;
 }
 
 const SLUG_INDICATOR: Record<SlugStatus, React.ReactNode> = {
   checking: <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />,
-  available: <Check className="h-4 w-4 text-green-500" />,
+  available: <Check className="h-4 w-4 text-success" />,
   taken:     <X className="h-4 w-4 text-destructive" />,
   invalid:   <AlertCircle className="h-4 w-4 text-destructive" />,
   idle:      null,
 };
 
 const SLUG_HINT: Record<SlugStatus, { text: string; cls: string } | null> = {
-  available: { text: "Available!",                            cls: "text-green-600"   },
+  available: { text: "Available!",                            cls: "text-success"   },
   taken:     { text: "Already taken",                         cls: "text-destructive" },
   invalid:   { text: "Letters, numbers, - or _ (2–50 chars)", cls: "text-destructive" },
   checking:  null,
   idle:      null,
 };
 
-export function AddLinkDialog({ folders }: AddLinkDialogProps) {
-  const { state, dispatch, isPending, appDomain, handleSubmit } = useAddLinkDialog();
+export function AddLinkDialog({ folders, appUrl, teamId, triggerLabel = "New Link" }: AddLinkDialogProps) {
+  const { state, dispatch, isPending, appDomain, handleSubmit } = useAddLinkDialog(teamId, appUrl);
 
   const { open, url, customSlug, expiresAt, folderId, notes, password, showPassword, geoRules, slugStatus, showAdvanced } =
     state;
@@ -65,7 +69,7 @@ export function AddLinkDialog({ folders }: AddLinkDialogProps) {
       <DialogTrigger asChild>
         <Button size="sm" className="gap-1.5">
           <Plus className="h-4 w-4" />
-          New Link
+          {triggerLabel}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg bg-card text-card-foreground shadow">
@@ -106,17 +110,19 @@ export function AddLinkDialog({ folders }: AddLinkDialogProps) {
             type="button"
             onClick={() => dispatch({ type: "PATCH", payload: { showAdvanced: !showAdvanced } })}
             className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            aria-expanded={showAdvanced}
+            aria-controls="add-link-advanced-options"
           >
             {showAdvanced ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
             Advanced options
           </button>
 
           {showAdvanced && (
-            <div className="space-y-5 pt-2 border-t">
+            <div id="add-link-advanced-options" className="space-y-5 pt-2 border-t">
               {/* Custom alias */}
               <div className="space-y-1.5">
                 <Label htmlFor="al-slug">Custom alias</Label>
-                <div className="flex items-center rounded-md border border-input focus-within:ring-1 focus-within:ring-ring overflow-hidden bg-background">
+                <div className="flex items-center border border-input focus-within:ring-1 focus-within:ring-ring overflow-hidden bg-background">
                   <span className="px-3 h-9 flex items-center text-sm text-muted-foreground bg-muted border-r whitespace-nowrap shrink-0">
                     {appDomain}/
                   </span>
@@ -136,20 +142,20 @@ export function AddLinkDialog({ folders }: AddLinkDialogProps) {
                   )}
                 </div>
                 {SLUG_HINT[slugStatus] && (
-                  <p className={`text-xs ${SLUG_HINT[slugStatus]!.cls}`}>{SLUG_HINT[slugStatus]!.text}</p>
+                  <p className={`text-xs ${SLUG_HINT[slugStatus]!.cls}`} role="status">{SLUG_HINT[slugStatus]!.text}</p>
                 )}
               </div>
 
               {/* Folder */}
               {folders.length > 0 && (
                 <div className="space-y-1.5">
-                  <Label>Folder</Label>
+                  <Label htmlFor="al-folder">Folder</Label>
                   <Select
                     value={folderId}
                     onValueChange={(v) => dispatch({ type: "PATCH", payload: { folderId: v } })}
                     disabled={isPending}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="al-folder">
                       <SelectValue placeholder="No folder" />
                     </SelectTrigger>
                     <SelectContent>
@@ -187,7 +193,9 @@ export function AddLinkDialog({ folders }: AddLinkDialogProps) {
                   <button
                     type="button"
                     onClick={() => dispatch({ type: "PATCH", payload: { showPassword: !showPassword } })}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute right-0 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center text-muted-foreground hover:text-foreground"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-pressed={showPassword}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -205,7 +213,7 @@ export function AddLinkDialog({ folders }: AddLinkDialogProps) {
                   type="datetime-local"
                   value={expiresAt}
                   onChange={(e) => dispatch({ type: "PATCH", payload: { expiresAt: e.target.value } })}
-                  min={new Date(Date.now() + 60_000).toISOString().slice(0, 16)}
+                  min={toDateTimeLocalValue(new Date(Date.now() + 60_000))}
                   disabled={isPending}
                 />
               </div>

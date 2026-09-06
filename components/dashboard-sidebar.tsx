@@ -21,6 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import {
   Archive,
+  Crosshair,
   FolderOpen,
   Link2,
   Loader2,
@@ -39,24 +40,14 @@ import { toast } from "sonner";
 
 type FolderItem = { id: string; name: string; color: string; _count: { links: number } };
 type TagItem = { id: string; name: string; color: string; _count: { links: number } };
-type User = { name?: string | null; email?: string | null; image?: string | null };
-
 interface DashboardSidebarProps {
   folders: FolderItem[];
   tags: TagItem[];
-  activeFolderId?: string;
-  activeTagId?: string;
-  showArchived?: boolean;
-  user?: User;
 }
 
 export function DashboardSidebar({
   folders: initialFolders,
   tags: initialTags,
-  activeFolderId,
-  activeTagId,
-  showArchived,
-  user,
 }: DashboardSidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -71,6 +62,12 @@ export function DashboardSidebar({
   const [showNewTag, setShowNewTag] = useState(false);
   const [deletingFolderId, setDeletingFolderId] = useState<string | null>(null);
   const [deletingTagId, setDeletingTagId] = useState<string | null>(null);
+  const activeFolderId = searchParams.get("folderId") ?? undefined;
+  const activeTagId = searchParams.get("tagId") ?? undefined;
+  const showArchived = searchParams.get("archived") === "1";
+
+  useEffect(() => setFolders(initialFolders), [initialFolders]);
+  useEffect(() => setTags(initialTags), [initialTags]);
 
   function buildUrl(params: Record<string, string | undefined>) {
     const current = new URLSearchParams(searchParams.toString());
@@ -140,19 +137,19 @@ export function DashboardSidebar({
   const isAll = !activeFolderId && !activeTagId && !showArchived;
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className="dispatch-sidebar">
       {/* ── Header: brand ── */}
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild size="lg">
               <Link href="/">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-primary text-primary-foreground text-sm font-bold shrink-0">
-                  S
+                <div className="dispatch-sidebar__register flex aspect-square size-8 items-center justify-center border border-primary text-primary text-sm font-bold shrink-0">
+                  <Crosshair className="h-4 w-4" aria-hidden="true" />
                 </div>
                 <div className="flex flex-col leading-tight">
-                  <span className="font-semibold text-sm">shrten</span>
-                  <span className="text-xs text-sidebar-foreground/50">URL Shortener</span>
+                  <span className="font-semibold text-base">shrten</span>
+                  <span className="font-mono text-[0.6rem] uppercase tracking-[0.08em] text-sidebar-foreground/55">Dispatch ledger</span>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -222,8 +219,10 @@ export function DashboardSidebar({
             </span>
             <button
               onClick={() => setShowNewFolder((v) => !v)}
-              className="ml-auto text-sidebar-foreground/40 hover:text-sidebar-foreground transition-colors p-0.5 rounded"
+              className="ml-auto border border-transparent p-1 text-sidebar-foreground/50 transition-colors hover:border-sidebar-border hover:text-sidebar-foreground"
               title="New folder"
+              aria-label="New folder"
+              aria-expanded={showNewFolder}
             >
               <Plus className="h-3.5 w-3.5" />
             </button>
@@ -239,7 +238,7 @@ export function DashboardSidebar({
                       <span className="ml-auto text-xs text-sidebar-foreground/40 tabular-nums">{folder._count.links}</span>
                     </Link>
                   </SidebarMenuButton>
-                  <SidebarMenuAction showOnHover onClick={() => handleDeleteFolder(folder.id)} disabled={deletingFolderId === folder.id || isPending} title="Delete folder">
+                  <SidebarMenuAction showOnHover onClick={() => handleDeleteFolder(folder.id)} disabled={deletingFolderId === folder.id || isPending} title="Delete folder" aria-label={`Delete folder ${folder.name}`}>
                     {deletingFolderId === folder.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
                   </SidebarMenuAction>
                 </SidebarMenuItem>
@@ -256,11 +255,11 @@ export function DashboardSidebar({
                       className="h-7 text-xs" />
                     <div className="flex gap-1">
                       <button onClick={handleCreateFolder} disabled={!newFolderName.trim() || isPending}
-                        className="flex-1 rounded-md bg-primary px-2 py-1 text-xs text-primary-foreground disabled:opacity-50">
+                        className="flex-1 border border-foreground bg-accent px-2 py-1 text-xs font-semibold text-accent-foreground disabled:opacity-50">
                         {isPending ? <Loader2 className="h-3 w-3 animate-spin mx-auto" /> : "Create"}
                       </button>
                       <button onClick={() => { setShowNewFolder(false); setNewFolderName(""); }}
-                        className="rounded-md px-2 py-1 text-xs hover:bg-sidebar-accent">Cancel</button>
+                        className="border border-transparent px-2 py-1 text-xs hover:border-sidebar-border">Cancel</button>
                     </div>
                   </div>
                 </SidebarMenuItem>
@@ -280,8 +279,10 @@ export function DashboardSidebar({
             </span>
             <button
               onClick={() => setShowNewTag((v) => !v)}
-              className="ml-auto text-sidebar-foreground/40 hover:text-sidebar-foreground transition-colors p-0.5 rounded"
+              className="ml-auto border border-transparent p-1 text-sidebar-foreground/50 transition-colors hover:border-sidebar-border hover:text-sidebar-foreground"
               title="New tag"
+              aria-label="New tag"
+              aria-expanded={showNewTag}
             >
               <Plus className="h-3.5 w-3.5" />
             </button>
@@ -297,7 +298,7 @@ export function DashboardSidebar({
                       <span className="ml-auto text-xs text-sidebar-foreground/40 tabular-nums">{tag._count.links}</span>
                     </Link>
                   </SidebarMenuButton>
-                  <SidebarMenuAction showOnHover onClick={() => handleDeleteTag(tag.id)} disabled={deletingTagId === tag.id || isPending} title="Delete tag">
+                  <SidebarMenuAction showOnHover onClick={() => handleDeleteTag(tag.id)} disabled={deletingTagId === tag.id || isPending} title="Delete tag" aria-label={`Delete tag ${tag.name}`}>
                     {deletingTagId === tag.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
                   </SidebarMenuAction>
                 </SidebarMenuItem>
@@ -314,11 +315,11 @@ export function DashboardSidebar({
                       className="h-7 text-xs" />
                     <div className="flex gap-1">
                       <button onClick={handleCreateTag} disabled={!newTagName.trim() || isPending}
-                        className="flex-1 rounded-md bg-primary px-2 py-1 text-xs text-primary-foreground disabled:opacity-50">
+                        className="flex-1 border border-foreground bg-accent px-2 py-1 text-xs font-semibold text-accent-foreground disabled:opacity-50">
                         {isPending ? <Loader2 className="h-3 w-3 animate-spin mx-auto" /> : "Create"}
                       </button>
                       <button onClick={() => { setShowNewTag(false); setNewTagName(""); }}
-                        className="rounded-md px-2 py-1 text-xs hover:bg-sidebar-accent">Cancel</button>
+                        className="border border-transparent px-2 py-1 text-xs hover:border-sidebar-border">Cancel</button>
                     </div>
                   </div>
                 </SidebarMenuItem>

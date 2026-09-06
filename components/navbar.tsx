@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, LogOut, Users } from "lucide-react";
+import { ArrowRight, Crosshair, LayoutDashboard, LogOut, Users } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
@@ -17,22 +17,27 @@ export async function Navbar() {
   const session = await auth();
 
   return (
-    <nav className="border-b border-border/60 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/70 sticky top-0 z-50">
-      <div className="container mx-auto px-4 h-14 flex items-center justify-between max-w-6xl">
+    <nav className="dispatch-nav">
+      <div className="dispatch-nav__brand">
+        <Crosshair className="dispatch-nav__registration" aria-hidden="true" />
         <Link
           href="/"
-          className="flex items-center tracking-tight text-[1.1rem] leading-none"
+          className="dispatch-wordmark"
         >
           <span className="font-black text-foreground">shrt</span>
           <span className="font-extralight text-muted-foreground">en</span>
         </Link>
-
-        <div className="flex items-center gap-2">
+        <div className="dispatch-nav__theme">
           <ThemeToggle />
+        </div>
+      </div>
+
+      <div className="dispatch-nav__actions">
+        <div className="dispatch-nav__account">
           {session?.user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2 h-9 rounded-xl">
+                <Button variant="ghost" size="sm" className="dispatch-account-button">
                   {session.user.image ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -41,7 +46,7 @@ export async function Navbar() {
                       className="h-6 w-6 rounded-full object-cover ring-2 ring-primary/20"
                     />
                   ) : (
-                    <div className="h-6 w-6 rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground flex items-center justify-center text-xs font-bold shrink-0">
+                    <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shrink-0">
                       {(session.user.name ?? session.user.email ?? "?")[0].toUpperCase()}
                     </div>
                   )}
@@ -50,7 +55,7 @@ export async function Navbar() {
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52 rounded-2xl p-1.5">
+              <DropdownMenuContent align="end" className="w-52 rounded-none p-1.5">
                 <DropdownMenuLabel className="font-normal px-2 py-1.5">
                   <div className="flex flex-col space-y-0.5">
                     <p className="text-sm font-medium leading-none">{session.user.name}</p>
@@ -60,20 +65,20 @@ export async function Navbar() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="my-1" />
-                <DropdownMenuItem asChild className="rounded-xl">
+                <DropdownMenuItem asChild className="rounded-none">
                   <Link href="/dashboard" className="cursor-pointer">
                     <LayoutDashboard className="h-4 w-4" />
                     Dashboard
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild className="rounded-xl">
+                <DropdownMenuItem asChild className="rounded-none">
                   <Link href="/dashboard/teams" className="cursor-pointer">
                     <Users className="h-4 w-4" />
                     Teams
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="my-1" />
-                <DropdownMenuItem asChild className="rounded-xl">
+                <DropdownMenuItem asChild className="rounded-none">
                   <form action={signOutAction} className="w-full">
                     <button
                       type="submit"
@@ -87,8 +92,11 @@ export async function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button size="sm" asChild className="rounded-xl">
-              <Link href="/sign-in">Get started</Link>
+            <Button size="sm" asChild className="dispatch-get-started">
+              <Link href="/sign-in">
+                Get started
+                <ArrowRight aria-hidden="true" />
+              </Link>
             </Button>
           )}
         </div>

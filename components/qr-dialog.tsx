@@ -51,7 +51,7 @@ export function QRDialog({ slug, shortUrl }: QRDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="icon" variant="ghost" className="h-8 w-8">
+        <Button size="icon" variant="ghost" className="h-8 w-8" aria-label={`Show QR code for /${slug}`}>
           <QrCode className="h-4 w-4" />
         </Button>
       </DialogTrigger>
@@ -61,7 +61,7 @@ export function QRDialog({ slug, shortUrl }: QRDialogProps) {
           <DialogDescription className="truncate">{shortUrl}</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col items-center gap-4 py-2">
-          <div className="p-4 bg-white rounded-lg border">
+          <div className="p-4 bg-white border">
             <QRCodeSVG
               id={`qr-${slug}`}
               value={shortUrl}

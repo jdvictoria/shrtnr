@@ -11,6 +11,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
   providers: [
+    // Deprecated for new sign-ins; retained temporarily for legacy linked accounts.
     GitHub,
     Credentials({
       credentials: {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useMemo } from "react";
+import { useEffect, useState, useTransition, useMemo } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -39,6 +39,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import {
   Archive,
   ArchiveRestore,
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
   CalendarIcon,
   Check,
   ChevronLeft,
@@ -62,7 +65,6 @@ import { type DateRange } from "react-day-picker";
 import { QRDialog } from "@/components/qr-dialog";
 import { EditLinkDialog } from "@/components/edit-link-dialog";
 import { deleteLink, togglePin, toggleActive, toggleArchive } from "@/lib/actions";
-import { getAppUrl } from "@/lib/utils";
 import { toast } from "sonner";
 
 type TagData = { id: string; name: string; color: string };
@@ -94,6 +96,8 @@ interface LinksTableProps {
   page: number;
   totalPages: number;
   total: number;
+  appUrl: string;
+  canManage?: boolean;
 }
 
 function ExpiryText({ expiresAt }: { expiresAt: Date | null }) {
@@ -114,6 +118,8 @@ export function LinksTable({
   page,
   totalPages,
   total,
+  appUrl,
+  canManage = true,
 }: LinksTableProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -130,7 +136,7 @@ export function LinksTable({
   const [sortKey, setSortKey] = useState<SortKey>("createdAt");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const appUrl = getAppUrl();
+  useEffect(() => setLinks(initialLinks), [initialLinks]);
 
   function cycleSort(key: SortKey) {
     if (sortKey === key) setSortDir((d) => (d === "desc" ? "asc" : "desc"));
@@ -184,7 +190,11 @@ export function LinksTable({
     startTransition(async () => {
       const res = await deleteLink(id);
       if (!res.success) toast.error(res.error);
-      else { setLinks((prev) => prev.filter((l) => l.id !== id)); toast.success("Link deleted"); }
+      else {
+        setLinks((prev) => prev.filter((l) => l.id !== id));
+        toast.success("Link deleted");
+        router.refresh();
+      }
       setDeletingId(null);
     });
   }
@@ -197,6 +207,7 @@ export function LinksTable({
       else {
         setLinks((prev) => prev.map((l) => l.id === id ? { ...l, isPinned: res.data.isPinned } : l));
         toast.success(res.data.isPinned ? "Link pinned" : "Link unpinned");
+        router.refresh();
       }
       setPinningId(null);
     });
@@ -210,6 +221,7 @@ export function LinksTable({
       else {
         setLinks((prev) => prev.map((l) => l.id === id ? { ...l, isActive: res.data.isActive } : l));
         toast.success(res.data.isActive ? "Link activated" : "Link deactivated");
+        router.refresh();
       }
       setTogglingId(null);
     });
@@ -220,20 +232,25 @@ export function LinksTable({
     startTransition(async () => {
       const res = await toggleArchive(id);
       if (!res.success) toast.error(res.error);
-      else { setLinks((prev) => prev.filter((l) => l.id !== id)); toast.success(res.data.isArchived ? "Link archived" : "Link restored"); }
+      else {
+        setLinks((prev) => prev.filter((l) => l.id !== id));
+        toast.success(res.data.isArchived ? "Link archived" : "Link restored");
+        router.refresh();
+      }
       setArchivingId(null);
     });
   }
 
-  function handleSaved(id: string, updated: { url: string; notes: string | null; folderId: string | null; tagIds: string[] }) {
+  function handleSaved(id: string, updated: { url: string; notes: string | null; folderId: string | null; tagIds: string[]; expiresAt: Date | null }) {
     setLinks((prev) =>
       prev.map((l) => {
         if (l.id !== id) return l;
         const newTags = tags.filter((t) => updated.tagIds.includes(t.id)).map((t) => ({ tag: t }));
         const newFolder = folders.find((f) => f.id === updated.folderId) ?? null;
-        return { ...l, url: updated.url, notes: updated.notes, folderId: updated.folderId, folder: newFolder, tags: newTags };
+        return { ...l, url: updated.url, notes: updated.notes, expiresAt: updated.expiresAt, folderId: updated.folderId, folder: newFolder, tags: newTags };
       })
     );
+    router.refresh();
   }
 
   function goToPage(p: number) {
@@ -243,11 +260,17 @@ export function LinksTable({
   }
 
   const SortBtn = ({ col, label }: { col: SortKey; label: string }) => (
-    <button onClick={() => cycleSort(col)} className="flex items-center gap-0.5 hover:text-foreground transition-colors">
+    <button
+      onClick={() => cycleSort(col)}
+      className="flex items-center gap-0.5 hover:text-foreground transition-colors"
+      aria-label={`Sort by ${label}${sortKey === col ? `, currently ${sortDir === "desc" ? "descending" : "ascending"}` : ""}`}
+    >
       {label}
-      <span className="text-muted-foreground/50 text-[10px] ml-0.5">
-        {sortKey === col ? (sortDir === "desc" ? "↓" : "↑") : "↕"}
-      </span>
+      {sortKey === col ? (
+        sortDir === "desc" ? <ArrowDown className="ml-0.5 h-3 w-3" /> : <ArrowUp className="ml-0.5 h-3 w-3" />
+      ) : (
+        <ArrowUpDown className="ml-0.5 h-3 w-3 text-muted-foreground/50" />
+      )}
     </button>
   );
 
@@ -256,7 +279,7 @@ export function LinksTable({
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button size="icon" variant="ghost" className="h-8 w-8">
+          <Button size="icon" variant="ghost" className="h-8 w-8" aria-label={`More actions for /${link.slug}`}>
             {deletingId === link.id || archivingId === link.id || togglingId === link.id
               ? <Loader2 className="h-4 w-4 animate-spin" />
               : <MoreHorizontal className="h-4 w-4" />
@@ -311,7 +334,7 @@ export function LinksTable({
         />
       )}
 
-      <Card>
+      <Card className="dispatch-ledger-panel">
         <CardHeader>
           <div>
             <CardTitle>{showArchived ? "Archived Links" : "Your Links"}</CardTitle>
@@ -327,13 +350,18 @@ export function LinksTable({
               <div className="relative flex-1">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
                 <Input
+                  aria-label="Search links"
                   placeholder="Search by slug, URL or notes..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="pl-8 h-8 text-sm"
                 />
                 {search && (
-                  <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                  <button
+                    onClick={() => setSearch("")}
+                    className="absolute right-0 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center text-muted-foreground hover:text-foreground"
+                    aria-label="Clear search"
+                  >
                     <X className="h-3.5 w-3.5" />
                   </button>
                 )}
@@ -344,6 +372,7 @@ export function LinksTable({
                     variant={dateRange?.from ? "secondary" : "outline"}
                     size="sm"
                     className="h-8 w-8 p-0 shrink-0 sm:w-auto sm:gap-1.5 sm:px-2.5 sm:text-xs"
+                    aria-label="Choose date range"
                   >
                     <CalendarIcon className="h-3.5 w-3.5 shrink-0" />
                     {dateRange?.from ? (
@@ -380,7 +409,7 @@ export function LinksTable({
             {/* Row 2 (mobile only): active date range + clear, full width */}
             {dateRange?.from && (
               <div className="flex items-center gap-2 sm:hidden">
-                <div className="flex-1 h-8 flex items-center rounded-md border border-input bg-secondary px-2.5 text-xs text-secondary-foreground gap-1.5">
+                <div className="flex-1 h-8 flex items-center border border-input bg-secondary px-2.5 text-xs text-secondary-foreground gap-1.5">
                   <CalendarIcon className="h-3.5 w-3.5 shrink-0" />
                   {dateRange.to
                     ? `${format(dateRange.from, "MMM d")} – ${format(dateRange.to, "MMM d")}`
@@ -436,7 +465,7 @@ export function LinksTable({
                               <div className="flex flex-wrap gap-1 mt-1">
                                 {link.tags.map(({ tag }) => (
                                   <span key={tag.id}
-                                    className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium text-white"
+                                    className="inline-flex items-center rounded-none px-1.5 py-0.5 font-mono text-[10px] font-medium text-white"
                                     style={{ backgroundColor: tag.color }}>
                                     {tag.name}
                                   </span>
@@ -481,19 +510,19 @@ export function LinksTable({
                           <TableCell className="text-right">
                             <div className="flex justify-end items-center gap-1">
                               {/* Pin */}
-                              <Tooltip>
+                              {canManage && <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handlePin(link.id)} disabled={pinningId === link.id || isPending}>
+                                  <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handlePin(link.id)} disabled={pinningId === link.id || isPending} aria-label={`${link.isPinned ? "Unpin" : "Pin"} /${link.slug}`}>
                                     {pinningId === link.id ? <Loader2 className="h-4 w-4 animate-spin" /> : link.isPinned ? <PinOff className="h-4 w-4 text-primary" /> : <Pin className="h-4 w-4" />}
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>{link.isPinned ? "Unpin" : "Pin"}</TooltipContent>
-                              </Tooltip>
+                              </Tooltip>}
 
                               {/* Copy */}
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleCopy(link)}>
+                                  <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleCopy(link)} aria-label={copiedId === link.id ? `Copied /${link.slug}` : `Copy /${link.slug}`}>
                                     {copiedId === link.id ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                                   </Button>
                                 </TooltipTrigger>
@@ -506,14 +535,14 @@ export function LinksTable({
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Button size="icon" variant="ghost" className="h-8 w-8" asChild>
-                                    <Link href={`/dashboard/${link.id}`}><LineChart className="h-4 w-4" /></Link>
+                                    <Link href={`/dashboard/${link.id}`} aria-label={`View analytics for /${link.slug}`}><LineChart className="h-4 w-4" /></Link>
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>Analytics</TooltipContent>
                               </Tooltip>
 
                               {/* ⋯ grouped actions */}
-                              <ActionsMenu link={link} />
+                              {canManage && <ActionsMenu link={link} />}
                             </div>
                           </TableCell>
                         </TableRow>
@@ -529,7 +558,7 @@ export function LinksTable({
                   const shortUrl = `${appUrl}/${link.slug}`;
                   return (
                     <div key={link.id} data-testid="link-row"
-                      className={`border rounded-lg p-3 space-y-2 ${link.isPinned ? "border-primary/30 bg-primary/5" : ""}`}>
+                      className={`border p-3 space-y-2 ${link.isPinned ? "border-primary bg-primary/5" : ""}`}>
                       {/* Top row: slug + clicks */}
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
@@ -545,7 +574,7 @@ export function LinksTable({
                             <div className="flex flex-wrap gap-1 mt-1">
                               {link.tags.map(({ tag }) => (
                                 <span key={tag.id}
-                                  className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium text-white"
+                                  className="inline-flex items-center rounded-none px-1.5 py-0.5 font-mono text-[10px] font-medium text-white"
                                   style={{ backgroundColor: tag.color }}>
                                   {tag.name}
                                 </span>
@@ -573,19 +602,19 @@ export function LinksTable({
                         </span>
                         <div className="flex items-center gap-1">
                           {/* Pin */}
-                          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handlePin(link.id)} disabled={pinningId === link.id || isPending}>
+                          {canManage && <Button size="icon" variant="ghost" className="h-11 w-11" onClick={() => handlePin(link.id)} disabled={pinningId === link.id || isPending} aria-label={`${link.isPinned ? "Unpin" : "Pin"} /${link.slug}`}>
                             {pinningId === link.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : link.isPinned ? <PinOff className="h-3.5 w-3.5 text-primary" /> : <Pin className="h-3.5 w-3.5" />}
-                          </Button>
+                          </Button>}
                           {/* Copy */}
-                          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleCopy(link)}>
+                          <Button size="icon" variant="ghost" className="h-11 w-11" onClick={() => handleCopy(link)} aria-label={copiedId === link.id ? `Copied /${link.slug}` : `Copy /${link.slug}`}>
                             {copiedId === link.id ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
                           </Button>
                           {/* Analytics */}
-                          <Button size="icon" variant="ghost" className="h-7 w-7" asChild>
-                            <Link href={`/dashboard/${link.id}`}><LineChart className="h-3.5 w-3.5" /></Link>
+                          <Button size="icon" variant="ghost" className="h-11 w-11" asChild>
+                            <Link href={`/dashboard/${link.id}`} aria-label={`View analytics for /${link.slug}`}><LineChart className="h-3.5 w-3.5" /></Link>
                           </Button>
                           {/* ⋯ grouped actions */}
-                          <ActionsMenu link={link} />
+                          {canManage && <ActionsMenu link={link} />}
                         </div>
                       </div>
                     </div>
@@ -607,6 +636,7 @@ export function LinksTable({
                   className="h-8 w-8 p-0"
                   disabled={page <= 1}
                   onClick={() => goToPage(page - 1)}
+                  aria-label="Previous page"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -627,6 +657,8 @@ export function LinksTable({
                         size="sm"
                         className="h-8 w-8 p-0 text-xs"
                         onClick={() => goToPage(p as number)}
+                        aria-label={`Go to page ${p}`}
+                        aria-current={p === page ? "page" : undefined}
                       >
                         {p}
                       </Button>
@@ -638,6 +670,7 @@ export function LinksTable({
                   className="h-8 w-8 p-0"
                   disabled={page >= totalPages}
                   onClick={() => goToPage(page + 1)}
+                  aria-label="Next page"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
